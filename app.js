@@ -45,6 +45,7 @@ const APP = {
   },
 
   seedDemo() {
+    // currentUser는 건드리지 않음 — 세션 유지
     const users = [
       { id: "u1", name: "김민준", phone: "1234", teamId: 0, joinDate: "2026-03-01", token: "tok_u1" },
       { id: "u2", name: "이서연", phone: "5678", teamId: 0, joinDate: "2026-03-01", token: "tok_u2" },
@@ -76,7 +77,7 @@ const APP = {
       { id: "r16", userId: "u7", date: "2026-03-14", km: 6.2,  status: "rejected", submittedAt: "2026-03-14T19:00:00", reviewedAt: "2026-03-14T21:00:00", note: "날짜 불일치", flagAbnormal: false },
     ];
     this.setData("records", records);
-    this.setData("currentUser", null);
+    // currentUser는 시드에서 설정하지 않음 (세션 유지)
   },
 
   // ── Computed getters ─────────────────────────────────────────────────────
@@ -158,12 +159,13 @@ const APP = {
 
   registerUser(name, phone, teamId) {
     const users = this.getUsers();
-    if (users.find(u => u.name === name && u.phone === phone.slice(-4))) {
-      return { ok: false, msg: "이미 등록된 참가자입니다." };
+    const phone4 = phone.slice(-4);
+    if (users.find(u => u.name === name && u.phone === phone4)) {
+      return { ok: false, msg: "이미 등록된 참가자입니다. 로그인을 이용해주세요." };
     }
     const id = "u" + Date.now();
     const token = "tok_" + id;
-    const user = { id, name, phone: phone.slice(-4), teamId: parseInt(teamId), joinDate: new Date().toISOString().slice(0,10), token };
+    const user = { id, name, phone: phone4, teamId: parseInt(teamId), joinDate: new Date().toISOString().slice(0,10), token };
     users.push(user);
     this.setData("users", users);
     this.setData("currentUser", id);

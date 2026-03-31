@@ -218,7 +218,14 @@ body { min-height: 100vh; }
 <script>
 APP.init();
 
-// Set default date to today
+// 로그인 여부 확인 후 안내 배너 표시
+const user = APP.getCurrentUser();
+if (!user) {
+  const notice = document.createElement('div');
+  notice.style.cssText = 'background:rgba(255,107,71,.12);border:1px solid rgba(255,107,71,.35);font-family:var(--mono);font-size:10px;color:#FF6B47;padding:.7rem .9rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:.6rem;';
+  notice.innerHTML = '⚠ 대시보드에서 먼저 등록/로그인해주세요 &nbsp;·&nbsp; <a href="index.html" style="color:#FF6B47;text-decoration:underline;">등록하러 가기 →</a>';
+  document.querySelector('.wrap').prepend(notice);
+}
 const today = new Date().toISOString().slice(0, 10);
 document.getElementById('runDate').value = today;
 document.getElementById('runDate').max = today;

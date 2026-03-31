@@ -38,8 +38,8 @@ body { min-height: 100vh; overflow-x: hidden; }
 }
 .hero-bg {
   position: absolute; inset: 0;
-  /* 수정된 부분: 이미지가 밝을 경우를 대비해 텍스트가 잘 보이도록 어두운 반투명 막 적용 */
-  background: rgba(0, 0, 0, 0.6) repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,.015) 2px, rgba(255,255,255,.015) 4px);
+  background: rgba(0, 0, 0, 0.58);
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,.012) 2px, rgba(255,255,255,.012) 4px);
   pointer-events: none;
 }
 .hero-grid {
@@ -183,7 +183,7 @@ body { min-height: 100vh; overflow-x: hidden; }
 .m-text.done { color: var(--text); }
 
 /* ── MY TEAM ── */
-.my-team-section { border: 1px solid var(--border); margin-bottom: 1.5rem; }
+.my-team-section { border: 1px solid var(--border); margin-bottom: 1.5rem; display: none; }
 .contrib-bar-wrap { padding: .8rem 1rem; }
 .contrib-label { display: flex; justify-content: space-between; margin-bottom: .5rem; }
 .contrib-label span { font-family: var(--mono); font-size: 10px; color: var(--muted); }
@@ -440,18 +440,26 @@ function selectTeam(id) {
 }
 
 function renderAll() {
-  if (typeof APP === 'undefined') return; // 에러 방지
-  
+  if (typeof APP === 'undefined') return;
+
   const user = APP.getCurrentUser();
   const modal = document.getElementById('modalWrap');
+
+  // 공개 섹션은 항상 렌더링
+  renderSeoul();
+  renderProgress();
+  renderRanking();
+  renderMission();
 
   if (!user) {
     modal.classList.remove('hidden');
     buildTeamChoices();
+    document.getElementById('myTeamSection').style.display = 'none';
     return;
   }
-  
+
   modal.classList.add('hidden');
+  document.getElementById('myTeamSection').style.display = 'block';
 
   const team = APP.TEAMS[user.teamId];
   const chip = document.getElementById('userChip');
@@ -459,10 +467,6 @@ function renderAll() {
   chip.style.borderColor = team.color;
   chip.style.color = team.color;
 
-  renderSeoul();
-  renderProgress();
-  renderRanking();
-  renderMission();
   renderMyTeam(user);
 }
 
