@@ -101,7 +101,7 @@ body { min-height: 100vh; overflow-x: hidden; }
 /* ── MAIN LAYOUT ── */
 .main { max-width: 700px; margin: 0 auto; padding: 1.5rem 1rem 6rem; }
 
-/* ── SEOUL UNLOCK VISUAL ── */
+/* ── SEOUL UNLOCK VISUAL (IMAGE FILL) ── */
 .seoul-section {
   border: 1px solid var(--border); margin-bottom: 1.5rem; position: relative; overflow: hidden;
 }
@@ -112,10 +112,26 @@ body { min-height: 100vh; overflow-x: hidden; }
 }
 .section-label .pct { color: var(--c0); }
 
-.seoul-canvas { position: relative; width: 100%; height: 200px; overflow: hidden; }
-.seoul-svg { width: 100%; height: 100%; display: block; }
+.seoul-canvas { 
+  position: relative; width: 100%; height: 220px; 
+  background: #000; overflow: hidden; 
+}
+.seoul-img-base, .seoul-img-fill {
+  position: absolute; top: 0; left: 0; 
+  width: 100%; height: 100%; 
+  object-fit: cover; object-position: center;
+}
+/* 밑에 깔리는 어두운 흑백 이미지 */
+.seoul-img-base { 
+  opacity: 0.2; filter: grayscale(1); 
+}
+/* 위에 덮어지는 원본 이미지 (초기에는 clip-path로 100% 가려짐) */
+.seoul-img-fill {
+  clip-path: inset(0 100% 0 0); 
+  transition: clip-path 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
 
-/* Scanline overlay */
+/* Scanline overlay (레트로 느낌 유지) */
 .seoul-canvas::after {
   content: ''; position: absolute; inset: 0; pointer-events: none;
   background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,.3) 3px, rgba(0,0,0,.3) 4px);
@@ -281,31 +297,12 @@ body { min-height: 100vh; overflow-x: hidden; }
       <span>SEOUL UNLOCK</span>
       <span class="pct" id="unlockPct">0%</span>
     </div>
+    
     <div class="seoul-canvas">
-      <svg class="seoul-svg" id="seoulSvg" viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <filter id="glitch">
-            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" id="turbulence">
-              <animate attributeName="baseFrequency" dur="2s" values="0.65;0.7;0.65" repeatCount="indefinite"/>
-            </feTurbulence>
-            <feDisplacementMap in="SourceGraphic" scale="4" xChannelSelector="R" yChannelSelector="G"/>
-          </filter>
-        </defs>
-        <rect width="700" height="200" fill="#0a0a0a"/>
-        <g stroke="#1a1a1a" stroke-width=".5">
-          <line x1="0" y1="50" x2="700" y2="50"/><line x1="0" y1="100" x2="700" y2="100"/>
-          <line x1="0" y1="150" x2="700" y2="150"/>
-          <line x1="100" y1="0" x2="100" y2="200"/><line x1="200" y1="0" x2="200" y2="200"/>
-          <line x1="300" y1="0" x2="300" y2="200"/><line x1="400" y1="0" x2="400" y2="200"/>
-          <line x1="500" y1="0" x2="500" y2="200"/><line x1="600" y1="0" x2="600" y2="200"/>
-        </g>
-        <g id="fillArea0"><rect x="0"   y="0" width="175" height="200" fill="#E8FF47" opacity="0"/></g>
-        <g id="fillArea1"><rect x="175" y="0" width="175" height="200" fill="#47FFD4" opacity="0"/></g>
-        <g id="fillArea2"><rect x="350" y="0" width="175" height="200" fill="#FF6B47" opacity="0"/></g>
-        <g id="fillArea3"><rect x="525" y="0" width="175" height="200" fill="#C447FF" opacity="0"/></g>
-        <text id="seoulText" x="350" y="130" text-anchor="middle" font-family="'Space Mono',monospace" font-size="96" font-weight="700" fill="#ffffff" opacity="0.06" filter="url(#glitch)">SEOUL</text>
-      </svg>
+      <img src="seoul-bg.jpg" class="seoul-img-base" alt="Seoul Base">
+      <img src="seoul-bg.jpg" class="seoul-img-fill" id="seoulImgFill" alt="Seoul Fill">
     </div>
+
     <div class="landmark-strip" id="landmarkStrip"></div>
   </div>
 
@@ -432,7 +429,6 @@ function selectTeam(id) {
 function renderAll() {
   const modal = document.getElementById('modalWrap');
 
-  // 핵심: app.js 파일 로딩 실패 시 에러 화면을 띄워 사용자에게 알립니다.
   if (typeof APP === 'undefined') {
     document.getElementById('modalTitle').textContent = 'SYSTEM ERROR';
     document.getElementById('registerForm').innerHTML = `
@@ -441,18 +437,15 @@ function renderAll() {
         GitHub 서버에서 자바스크립트 파일을 찾지 못해 페이지가 정지되었습니다.<br><br>
         <b>해결 방법:</b><br>
         1. GitHub 레포지토리에 파일이 잘 올라갔는지 확인하세요.<br>
-        2. 파일 이름이 정확히 <b>app.js</b> (전부 소문자)인지 확인하세요. App.js 처럼 대문자가 섞이면 안 됩니다.
+        2. 파일 이름이 정확히 <b>app.js</b> (전부 소문자)인지 확인하세요.
       </div>`;
     document.getElementById('loginForm').style.display = 'none';
     return;
   }
 
-  // 정상 작동 시퀀스
   APP.init();
-
   const user = APP.getCurrentUser();
 
-  // 공개 섹션 렌더링
   renderSeoul();
   renderProgress();
   renderRanking();
@@ -465,7 +458,6 @@ function renderAll() {
     return;
   }
 
-  // 로그인 된 경우
   modal.classList.add('hidden');
   document.getElementById('myTeamSection').style.display = 'block';
 
@@ -483,18 +475,11 @@ function renderSeoul() {
   const pct = Math.min(100, (totalKm / APP.GOAL_KM) * 100);
   document.getElementById('unlockPct').textContent = pct.toFixed(1) + '%';
 
-  const scores = APP.getTeamScores();
-  const totalScore = scores.reduce((s,t) => s + t.totalKm, 0) || 1;
-  scores.forEach(t => {
-    const el = document.getElementById('fillArea' + t.id);
-    if (!el) return;
-    const ratio = t.totalKm / totalScore;
-    el.querySelector('rect').setAttribute('opacity', (ratio * 0.25).toFixed(3));
-  });
-
-  const textEl = document.getElementById('seoulText');
-  const cleanOpacity = Math.min(0.9, 0.06 + pct / 100 * 0.84);
-  textEl.setAttribute('opacity', cleanOpacity.toFixed(2));
+  // 핵심 수정: 이미지 clip-path 업데이트 (거리에 따라 오른쪽을 가림)
+  const fillImg = document.getElementById('seoulImgFill');
+  if (fillImg) {
+    fillImg.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+  }
 
   const strip = document.getElementById('landmarkStrip');
   strip.innerHTML = APP.LANDMARKS.map(lm => {
