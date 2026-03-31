@@ -31,10 +31,15 @@ body { min-height: 100vh; overflow-x: hidden; }
   padding: 3rem 1.5rem 2rem;
   overflow: hidden;
   border-bottom: 1px solid var(--border);
+  /* 수정된 부분: 배경 이미지 적용 */
+  background-image: url('main-bg.jpg');
+  background-size: cover;
+  background-position: center;
 }
 .hero-bg {
   position: absolute; inset: 0;
-  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,.015) 2px, rgba(255,255,255,.015) 4px);
+  /* 수정된 부분: 이미지가 밝을 경우를 대비해 텍스트가 잘 보이도록 어두운 반투명 막 적용 */
+  background: rgba(0, 0, 0, 0.6) repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,.015) 2px, rgba(255,255,255,.015) 4px);
   pointer-events: none;
 }
 .hero-grid {
@@ -43,7 +48,7 @@ body { min-height: 100vh; overflow-x: hidden; }
 }
 .campaign-tag {
   font-family: var(--mono); font-size: 10px; letter-spacing: 3px;
-  color: var(--muted); text-transform: uppercase; margin-bottom: .6rem;
+  color: #fff; text-transform: uppercase; margin-bottom: .6rem;
 }
 .hero-title {
   font-family: var(--mono); font-size: clamp(1.6rem, 6vw, 2.8rem);
@@ -67,8 +72,9 @@ body { min-height: 100vh; overflow-x: hidden; }
 
 .dday-badge {
   font-family: var(--mono); font-size: 11px;
-  border: 1px solid var(--border); padding: .4rem .8rem;
-  color: var(--muted); white-space: nowrap; margin-top: .4rem;
+  border: 1px solid rgba(255,255,255,0.3); padding: .4rem .8rem;
+  color: #fff; white-space: nowrap; margin-top: .4rem;
+  background: rgba(0,0,0,0.4);
 }
 .dday-badge span { color: var(--c0); }
 
@@ -76,18 +82,21 @@ body { min-height: 100vh; overflow-x: hidden; }
 .user-bar {
   max-width: 700px; margin: 1.2rem auto 0;
   display: flex; align-items: center; gap: .6rem; flex-wrap: wrap;
+  position: relative; z-index: 10;
 }
 .user-chip {
   font-family: var(--mono); font-size: 11px; letter-spacing: 1px;
   padding: .3rem .8rem; border: 1px solid; border-radius: 2px;
+  background: rgba(0,0,0,0.6);
 }
 .nav-links { display: flex; gap: .5rem; margin-left: auto; }
 .nav-links a {
   font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
-  color: var(--muted); text-decoration: none; padding: .3rem .6rem;
-  border: 1px solid var(--border); transition: all .2s;
+  color: #fff; text-decoration: none; padding: .3rem .6rem;
+  border: 1px solid rgba(255,255,255,0.3); transition: all .2s;
+  background: rgba(0,0,0,0.6);
 }
-.nav-links a:hover { color: var(--text); border-color: var(--text); }
+.nav-links a:hover { color: var(--c0); border-color: var(--c0); }
 
 /* ── MAIN LAYOUT ── */
 .main { max-width: 700px; margin: 0 auto; padding: 1.5rem 1rem 6rem; }
@@ -374,11 +383,10 @@ body { min-height: 100vh; overflow-x: hidden; }
 <script>
 // 1. app.js 로딩 및 에러 체크
 if (typeof APP === 'undefined') {
-  alert("🚨 app.js 파일을 불러올 수 없습니다!\nVS Code의 Live Server를 통해 브라우저를 띄웠는지 다시 한 번 확인해주세요.");
-  throw new Error("APP is not defined");
+  console.error("app.js 파일을 찾지 못했거나 오류가 있습니다.");
+} else {
+  APP.init();
 }
-
-APP.init();
 
 let selectedTeamId = null;
 let isLoginMode = false;
@@ -432,6 +440,8 @@ function selectTeam(id) {
 }
 
 function renderAll() {
+  if (typeof APP === 'undefined') return; // 에러 방지
+  
   const user = APP.getCurrentUser();
   const modal = document.getElementById('modalWrap');
 
