@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MY LOG · RUN TO COMPLETE SEOUL</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a; --surface: #111; --border: #222; --text: #f0f0f0;
+  --muted: #666; --c0: #E8FF47; --c1: #47FFD4; --c2: #FF6B47; --c3: #C447FF;
+  --mono: 'Space Mono', monospace; --sans: 'Noto Sans KR', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--bg); color: var(--text); font-family: var(--sans); }
+
+.topbar {
+  display: flex; align-items: center; gap: .8rem;
+  padding: .8rem 1.2rem; border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; background: var(--surface); z-index: 50;
+}
+.back-btn { font-family: var(--mono); font-size: 11px; color: var(--muted); text-decoration: none; }
+.back-btn:hover { color: var(--text); }
+.topbar-title { font-family: var(--mono); font-size: 11px; letter-spacing: 3px; }
+
+.wrap { max-width: 500px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+
+/* PROFILE HEADER */
+.profile-header {
+  display: flex; align-items: center; gap: 1rem;
+  border: 1px solid var(--border); padding: 1rem 1.1rem; margin-bottom: 1.5rem;
+}
+.profile-avatar {
+  width: 48px; height: 48px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 1.2rem; font-weight: 700; flex-shrink: 0;
+}
+.profile-name { font-size: 1rem; font-weight: 500; }
+.profile-team { font-family: var(--mono); font-size: 10px; margin-top: .2rem; }
+.profile-join { font-family: var(--mono); font-size: 9px; color: var(--muted); margin-top: .2rem; }
+
+/* STATS GRID */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .6rem; margin-bottom: 1.5rem; }
+.stat-box { border: 1px solid var(--border); padding: .8rem .9rem; }
+.stat-label { font-family: var(--mono); font-size: 8px; letter-spacing: 2px; color: var(--muted); margin-bottom: .3rem; }
+.stat-val { font-family: var(--mono); font-size: 1.2rem; font-weight: 700; }
+
+/* TEAM RANK */
+.rank-box {
+  border: 1px solid var(--border); padding: .9rem 1rem; margin-bottom: 1.5rem;
+  display: flex; align-items: center; gap: .8rem;
+}
+.rank-label { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 2px; margin-bottom: .2rem; }
+.rank-val { font-family: var(--mono); font-size: 1.5rem; font-weight: 700; }
+.rank-contrib { margin-left: auto; text-align: right; }
+.rank-contrib-label { font-family: var(--mono); font-size: 9px; color: var(--muted); margin-bottom: .2rem; }
+.rank-contrib-val { font-family: var(--mono); font-size: 1rem; font-weight: 700; }
+
+/* WEEKLY CHART */
+.weekly-section { border: 1px solid var(--border); margin-bottom: 1.5rem; }
+.section-header { padding: .6rem 1rem; border-bottom: 1px solid var(--border); }
+.section-title { font-family: var(--mono); font-size: 9px; letter-spacing: 3px; color: var(--muted); }
+.weekly-bars { padding: .8rem 1rem; display: flex; align-items: flex-end; gap: .4rem; height: 100px; }
+.week-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: .3rem; }
+.week-bar-track { flex: 1; width: 100%; background: var(--border); display: flex; flex-direction: column; justify-content: flex-end; }
+.week-bar-fill { width: 100%; min-height: 2px; transition: height .6s ease; }
+.week-label { font-family: var(--mono); font-size: 8px; color: var(--muted); }
+.week-km-label { font-family: var(--mono); font-size: 8px; }
+
+/* HISTORY TIMELINE */
+.history-section { border: 1px solid var(--border); }
+.history-item {
+  display: grid; grid-template-columns: auto 1fr auto;
+  gap: .6rem; align-items: center;
+  padding: .8rem 1rem; border-bottom: 1px solid var(--border);
+  transition: background .2s;
+}
+.history-item:last-child { border-bottom: none; }
+.history-item:hover { background: rgba(255,255,255,.02); }
+.h-status { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.h-status.approved { background: var(--c1); }
+.h-status.pending  { background: var(--c0); animation: blink 2s infinite; }
+.h-status.rejected { background: var(--c2); }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+.h-main { }
+.h-date { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+.h-note { font-family: var(--mono); font-size: 9px; color: var(--c2); margin-top: .2rem; }
+.h-right { text-align: right; }
+.h-km { font-family: var(--mono); font-size: 1rem; font-weight: 700; }
+.h-badge { font-family: var(--mono); font-size: 8px; padding: .15rem .4rem; margin-top: .2rem; display: inline-block; }
+.badge-approved { background: rgba(71,255,212,.15); color: var(--c1); }
+.badge-pending  { background: rgba(232,255,71,.15); color: var(--c0); }
+.badge-rejected { background: rgba(255,107,71,.15);  color: var(--c2); }
+
+.empty-history { padding: 2rem; text-align: center; font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; }
+
+/* SHARE BTN */
+.share-btn {
+  display: flex; align-items: center; justify-content: center; gap: .5rem;
+  width: 100%; background: transparent; border: 1px solid var(--border);
+  color: var(--muted); font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
+  padding: .8rem; cursor: pointer; margin-top: 1rem; transition: all .2s;
+}
+.share-btn:hover { border-color: var(--text); color: var(--text); }
+
+/* NO USER */
+.no-user { text-align: center; padding: 4rem 2rem; }
+.no-user h2 { font-family: var(--mono); font-size: 1rem; color: var(--muted); margin-bottom: 1rem; }
+.no-user a { font-family: var(--mono); font-size: 10px; color: var(--c0); text-decoration: none; letter-spacing: 2px; padding: .6rem 1.2rem; border: 1px solid var(--c0); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="back-btn">← BACK</a>
+  <div class="topbar-title">MY LOG</div>
+</div>
+
+<div class="wrap" id="mainWrap">
+  <div class="no-user" id="noUser">
+    <h2>로그인이 필요해요</h2>
+    <a href="index.html">대시보드로 →</a>
+  </div>
+  <div id="logContent" style="display:none"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+<script src="app.js"></script> ```
+
+<script src="app.js"></script>
+<script>
+APP.init();
+
+function render() {
+  const user = APP.getCurrentUser();
+  if (!user) { document.getElementById('noUser').style.display = 'block'; return; }
+  document.getElementById('noUser').style.display = 'none';
+  document.getElementById('logContent').style.display = 'block';
+
+  const team = APP.TEAMS[user.teamId];
+  const records = APP.getUserRecords(user.id);
+  const approved = records.filter(r => r.status === 'approved');
+  const totalKm = approved.reduce((s,r) => s+r.km, 0);
+  const teamApproved = APP.getApprovedRecords();
+
+  // Team rank
+  const teamUsers = APP.getUsers().filter(u => u.teamId === user.teamId);
+  const teamKms = teamUsers.map(u => ({
+    id: u.id,
+    km: teamApproved.filter(r => r.userId === u.id).reduce((s,r) => s+r.km, 0)
+  })).sort((a,b) => b.km - a.km);
+  const myRank = teamKms.findIndex(u => u.id === user.id) + 1;
+
+  // Weekly data (last 6 weeks)
+  const weeklyKm = Array(6).fill(0);
+  const campStart = new Date('2026-03-02');
+  approved.forEach(r => {
+    const rd = new Date(r.date);
+    const weekIdx = Math.floor((rd - campStart) / (7 * 86400000));
+    if (weekIdx >= 0 && weekIdx < 6) weeklyKm[weekIdx] += r.km;
+  });
+  const maxWeekKm = Math.max(...weeklyKm, 1);
+
+  document.getElementById('logContent').innerHTML = `
+    <div class="profile-header">
+      <div class="profile-avatar" style="background:${team.color}22;color:${team.color}">${user.name.slice(0,1)}</div>
+      <div>
+        <div class="profile-name">${user.name}</div>
+        <div class="profile-team" style="color:${team.color}">${team.name}</div>
+        <div class="profile-join">참가: ${user.joinDate}</div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-label">TOTAL KM</div>
+        <div class="stat-val" style="color:${team.color}">${totalKm.toFixed(1)}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">RUNS</div>
+        <div class="stat-val" style="color:var(--c1)">${approved.length}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">PENDING</div>
+        <div class="stat-val" style="color:var(--c0)">${records.filter(r=>r.status==='pending').length}</div>
+      </div>
+    </div>
+
+    <div class="rank-box">
+      <div>
+        <div class="rank-label">TEAM RANK</div>
+        <div class="rank-val" style="color:${team.color}">${myRank > 0 ? myRank + '위' : '-'}</div>
+      </div>
+      <div class="rank-contrib" style="margin-left:auto">
+        <div class="rank-contrib-label">팀 기여</div>
+        <div class="rank-contrib-val" style="color:${team.color}">${totalKm.toFixed(1)} km</div>
+      </div>
+    </div>
+
+    <div class="weekly-section">
+      <div class="section-header"><div class="section-title">WEEKLY DISTANCE</div></div>
+      <div class="weekly-bars">
+        ${weeklyKm.map((km, i) => `
+          <div class="week-bar-wrap">
+            <div class="week-km-label" style="color:${team.color};font-size:7px">${km > 0 ? km.toFixed(0) : ''}</div>
+            <div class="week-bar-track">
+              <div class="week-bar-fill" style="height:${(km/maxWeekKm*80).toFixed(0)}px;background:${team.color}"></div>
+            </div>
+            <div class="week-label">W${i+1}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="history-section">
+      <div class="section-header"><div class="section-title">RUN HISTORY</div></div>
+      ${records.length === 0
+        ? '<div class="empty-history">NO RECORDS YET</div>'
+        : records.map(r => `
+          <div class="history-item">
+            <div class="h-status ${r.status}"></div>
+            <div class="h-main">
+              <div class="h-date">${r.date}</div>
+              ${r.status === 'rejected' && r.note ? `<div class="h-note">반려: ${r.note}</div>` : ''}
+            </div>
+            <div class="h-right">
+              <div class="h-km" style="color:${team.color}">${r.km.toFixed(1)} km</div>
+              <div class="h-badge badge-${r.status}">${r.status === 'approved' ? '승인' : r.status === 'pending' ? '대기' : '반려'}</div>
+            </div>
+          </div>`).join('')}
+    </div>
+
+    <button class="share-btn" onclick="share()">
+      ↗ 성과 공유하기
+    </button>`;
+}
+
+function share() {
+  const user = APP.getCurrentUser();
+  if (!user) return;
+  const team = APP.TEAMS[user.teamId];
+  const approved = APP.getUserRecords(user.id).filter(r => r.status === 'approved');
+  const km = approved.reduce((s,r) => s+r.km, 0);
+  const text = `🏃 RUN TO COMPLETE SEOUL\n${user.name} · ${team.name}\n누적 ${km.toFixed(1)}km 달성! #런푸마팸5기`;
+  if (navigator.share) {
+    navigator.share({ title: 'RUN TO COMPLETE SEOUL', text });
+  } else {
+    navigator.clipboard.writeText(text).then(() => alert('클립보드에 복사됐어요!'));
+  }
+}
+
+render();
+</script>
+</body>
+</html>
