@@ -75,6 +75,18 @@ html { background: var(--bg); color: var(--text); font-family: var(--sans); }
   padding: .4rem 1rem; border: none; cursor: pointer; transition: all .2s;
 }
 .bulk-btn:hover { background: #fff; }
+.danger-btn {
+  background: transparent; color: var(--c2);
+  font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  padding: .4rem 1rem; border: 1px solid rgba(255,107,71,.4); cursor: pointer; transition: all .2s;
+}
+.danger-btn:hover { background: var(--c2); color: #000; border-color: var(--c2); }
+.del-sel-btn {
+  background: transparent; color: var(--muted);
+  font-family: var(--mono); font-size: 10px; letter-spacing: 1px;
+  padding: .4rem 1rem; border: 1px solid var(--border); cursor: pointer; transition: all .2s;
+}
+.del-sel-btn:hover { border-color: var(--c2); color: var(--c2); }
 
 /* RECORD GRID */
 .record-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: .8rem; }
@@ -212,6 +224,8 @@ html { background: var(--bg); color: var(--text); font-family: var(--sans); }
     </select>
     <button class="filter-toggle" id="flagToggle" onclick="toggleFlag()">⚠ 비정상만</button>
     <button class="bulk-btn" onclick="bulkApprove()">선택 일괄 승인</button>
+    <button class="del-sel-btn" onclick="deleteSelected()">선택 삭제</button>
+    <button class="danger-btn" onclick="deleteAllRecords()">전체 기록 삭제</button>
   </div>
 
   <div class="record-grid" id="recordGrid"></div>
@@ -396,6 +410,27 @@ function openLightbox(id) {
 }
 function closeLightbox() {
   document.getElementById('lightbox').classList.add('hidden');
+}
+
+function deleteSelected() {
+  if (selectedIds.size === 0) { alert('선택된 기록이 없어요.\n카드의 체크박스를 먼저 선택해주세요.'); return; }
+  if (!confirm(`선택된 ${selectedIds.size}건을 삭제할까요?\n이 작업은 되돌릴 수 없습니다.`)) return;
+  const records = APP.getRecords().filter(r => !selectedIds.has(r.id));
+  APP.setData('records', records);
+  selectedIds.clear();
+  renderStats(); renderCards();
+}
+
+function deleteAllRecords() {
+  const total = APP.getRecords().length;
+  if (total === 0) { alert('삭제할 기록이 없습니다.'); return; }
+  const input = prompt(`전체 기록 ${total}건을 모두 삭제합니다.\n확인하려면 "삭제" 를 입력해주세요.`);
+  if (input !== '삭제') { if (input !== null) alert('입력이 일치하지 않아 취소됐습니다.'); return; }
+  APP.setData('records', []);
+  APP.setData('seeded', false); // 다음 접속 시 시드 데이터 재생성 방지 원하면 true 유지 가능
+  selectedIds.clear();
+  renderStats(); renderCards();
+  alert(`✓ 전체 기록 ${total}건이 삭제됐습니다.`);
 }
 
 document.addEventListener('keydown', e => {
