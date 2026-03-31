@@ -121,38 +121,18 @@ body { min-height: 100vh; overflow-x: hidden; }
   width: 100%; height: 100%; 
   object-fit: cover; object-position: center;
 }
-/* 밑에 깔리는 어두운 흑백 이미지 */
 .seoul-img-base { 
   opacity: 0.2; filter: grayscale(1); 
 }
-/* 위에 덮어지는 원본 이미지 (초기에는 clip-path로 100% 가려짐) */
 .seoul-img-fill {
   clip-path: inset(0 100% 0 0); 
   transition: clip-path 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Scanline overlay (레트로 느낌 유지) */
 .seoul-canvas::after {
   content: ''; position: absolute; inset: 0; pointer-events: none;
   background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,.3) 3px, rgba(0,0,0,.3) 4px);
 }
-
-.landmark-strip {
-  display: flex; border-top: 1px solid var(--border);
-}
-.lm-item {
-  flex: 1; padding: .6rem .5rem; text-align: center;
-  border-right: 1px solid var(--border); position: relative;
-  transition: background .4s;
-}
-.lm-item:last-child { border-right: none; }
-.lm-icon { font-size: 14px; line-height: 1; margin-bottom: .2rem; filter: grayscale(1); opacity: .3; transition: all .5s; }
-.lm-name { font-family: var(--mono); font-size: 9px; color: var(--muted); }
-.lm-km   { font-family: var(--mono); font-size: 8px; color: var(--border); margin-top: 1px; }
-.lm-item.unlocked .lm-icon { filter: none; opacity: 1; }
-.lm-item.unlocked .lm-name { color: var(--c0); }
-.lm-item.unlocked .lm-km   { color: var(--muted); }
-.lm-item.unlocked { background: rgba(232,255,71,.04); }
 
 /* ── PROGRESS ROW ── */
 .progress-row {
@@ -302,8 +282,6 @@ body { min-height: 100vh; overflow-x: hidden; }
       <img src="seoul-bg.jpg" class="seoul-img-base" alt="Seoul Base">
       <img src="seoul-bg.jpg" class="seoul-img-fill" id="seoulImgFill" alt="Seoul Fill">
     </div>
-
-    <div class="landmark-strip" id="landmarkStrip"></div>
   </div>
 
   <div class="progress-row" id="progressRow"></div>
@@ -475,21 +453,11 @@ function renderSeoul() {
   const pct = Math.min(100, (totalKm / APP.GOAL_KM) * 100);
   document.getElementById('unlockPct').textContent = pct.toFixed(1) + '%';
 
-  // 핵심 수정: 이미지 clip-path 업데이트 (거리에 따라 오른쪽을 가림)
   const fillImg = document.getElementById('seoulImgFill');
   if (fillImg) {
     fillImg.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
   }
-
-  const strip = document.getElementById('landmarkStrip');
-  strip.innerHTML = APP.LANDMARKS.map(lm => {
-    const unlocked = totalKm >= lm.km;
-    return `<div class="lm-item ${unlocked ? 'unlocked' : ''}">
-      <div class="lm-icon">${lm.icon}</div>
-      <div class="lm-name">${lm.name}</div>
-      <div class="lm-km">${lm.km.toLocaleString()}km</div>
-    </div>`;
-  }).join('');
+  // 랜드마크 생성 로직 완벽히 삭제 완료
 }
 
 function renderProgress() {

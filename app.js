@@ -11,12 +11,8 @@ const APP = {
     { id: 3, name: "10KM D팀", color: "#C447FF", bg: "#150d1a", abbr: "DA" },
   ],
 
-  LANDMARKS: [
-    { km: 400,  id: "hangang",   name: "한강",    icon: "〰" },
-    { km: 800,  id: "namsan",    name: "남산타워", icon: "▲" },
-    { km: 1400, id: "gyeongbok", name: "경복궁",   icon: "⬛" },
-    { km: 2026, id: "complete",  name: "SEOUL 완성", icon: "★" },
-  ],
+  // 랜드마크 데이터는 index.html에서 삭제했으므로 여기서도 사용하지 않습니다.
+  LANDMARKS: [],
 
   WEEKLY_MISSIONS: [
     { week: 1, m1: "팀원 전원 1회 이상 제출", m2: "팀 총 거리 50km 이상", bonus: null },
@@ -45,39 +41,13 @@ const APP = {
   },
 
   seedDemo() {
-    // currentUser는 건드리지 않음 — 세션 유지
-    const users = [
-      { id: "u1", name: "김민준", phone: "1234", teamId: 0, joinDate: "2026-03-01", token: "tok_u1" },
-      { id: "u2", name: "이서연", phone: "5678", teamId: 0, joinDate: "2026-03-01", token: "tok_u2" },
-      { id: "u3", name: "박지호", phone: "2345", teamId: 1, joinDate: "2026-03-01", token: "tok_u3" },
-      { id: "u4", name: "최유나", phone: "6789", teamId: 1, joinDate: "2026-03-01", token: "tok_u4" },
-      { id: "u5", name: "정태양", phone: "3456", teamId: 2, joinDate: "2026-03-01", token: "tok_u5" },
-      { id: "u6", name: "한수진", phone: "7890", teamId: 2, joinDate: "2026-03-01", token: "tok_u6" },
-      { id: "u7", name: "오민혁", phone: "4567", teamId: 3, joinDate: "2026-03-01", token: "tok_u7" },
-      { id: "u8", name: "신예림", phone: "8901", teamId: 3, joinDate: "2026-03-01", token: "tok_u8" },
-    ];
+    // 모든 가짜 유저와 기록을 삭제하고 빈 배열(0명, 0km)로 시작합니다.
+    const users = [];
     this.setData("users", users);
 
-    const records = [
-      { id: "r1",  userId: "u1", date: "2026-03-03", km: 8.2,  status: "approved", submittedAt: "2026-03-03T19:00:00", reviewedAt: "2026-03-03T21:00:00", note: "", flagAbnormal: false },
-      { id: "r2",  userId: "u1", date: "2026-03-05", km: 10.5, status: "approved", submittedAt: "2026-03-05T18:30:00", reviewedAt: "2026-03-05T20:30:00", note: "", flagAbnormal: false },
-      { id: "r3",  userId: "u2", date: "2026-03-04", km: 6.0,  status: "approved", submittedAt: "2026-03-04T20:00:00", reviewedAt: "2026-03-04T22:00:00", note: "", flagAbnormal: false },
-      { id: "r4",  userId: "u2", date: "2026-03-06", km: 12.3, status: "approved", submittedAt: "2026-03-06T19:00:00", reviewedAt: "2026-03-06T21:00:00", note: "", flagAbnormal: false },
-      { id: "r5",  userId: "u3", date: "2026-03-03", km: 15.0, status: "approved", submittedAt: "2026-03-03T17:00:00", reviewedAt: "2026-03-03T19:00:00", note: "", flagAbnormal: false },
-      { id: "r6",  userId: "u3", date: "2026-03-07", km: 21.1, status: "approved", submittedAt: "2026-03-07T09:00:00", reviewedAt: "2026-03-07T11:00:00", note: "", flagAbnormal: false },
-      { id: "r7",  userId: "u4", date: "2026-03-05", km: 9.5,  status: "approved", submittedAt: "2026-03-05T20:00:00", reviewedAt: "2026-03-05T22:00:00", note: "", flagAbnormal: false },
-      { id: "r8",  userId: "u5", date: "2026-03-04", km: 10.0, status: "approved", submittedAt: "2026-03-04T19:30:00", reviewedAt: "2026-03-04T21:30:00", note: "", flagAbnormal: false },
-      { id: "r9",  userId: "u5", date: "2026-03-06", km: 10.0, status: "approved", submittedAt: "2026-03-06T18:00:00", reviewedAt: "2026-03-06T20:00:00", note: "", flagAbnormal: false },
-      { id: "r10", userId: "u6", date: "2026-03-05", km: 10.2, status: "approved", submittedAt: "2026-03-05T19:00:00", reviewedAt: "2026-03-05T21:00:00", note: "", flagAbnormal: false },
-      { id: "r11", userId: "u7", date: "2026-03-03", km: 5.5,  status: "approved", submittedAt: "2026-03-03T20:00:00", reviewedAt: "2026-03-03T22:00:00", note: "", flagAbnormal: false },
-      { id: "r12", userId: "u8", date: "2026-03-04", km: 7.8,  status: "approved", submittedAt: "2026-03-04T18:30:00", reviewedAt: "2026-03-04T20:30:00", note: "", flagAbnormal: false },
-      { id: "r13", userId: "u1", date: "2026-03-10", km: 55.0, status: "pending",  submittedAt: "2026-03-10T20:00:00", reviewedAt: null, note: "", flagAbnormal: true  },
-      { id: "r14", userId: "u3", date: "2026-03-12", km: 18.5, status: "pending",  submittedAt: "2026-03-12T19:30:00", reviewedAt: null, note: "", flagAbnormal: false },
-      { id: "r15", userId: "u5", date: "2026-03-13", km: 10.0, status: "pending",  submittedAt: "2026-03-13T17:00:00", reviewedAt: null, note: "", flagAbnormal: false },
-      { id: "r16", userId: "u7", date: "2026-03-14", km: 6.2,  status: "rejected", submittedAt: "2026-03-14T19:00:00", reviewedAt: "2026-03-14T21:00:00", note: "날짜 불일치", flagAbnormal: false },
-    ];
+    const records = [];
     this.setData("records", records);
-    // currentUser는 시드에서 설정하지 않음 (세션 유지)
+    this.setData("currentUser", null);
   },
 
   // ── Computed getters ─────────────────────────────────────────────────────
@@ -159,13 +129,12 @@ const APP = {
 
   registerUser(name, phone, teamId) {
     const users = this.getUsers();
-    const phone4 = phone.slice(-4);
-    if (users.find(u => u.name === name && u.phone === phone4)) {
-      return { ok: false, msg: "이미 등록된 참가자입니다. 로그인을 이용해주세요." };
+    if (users.find(u => u.name === name && u.phone === phone.slice(-4))) {
+      return { ok: false, msg: "이미 등록된 참가자입니다." };
     }
     const id = "u" + Date.now();
     const token = "tok_" + id;
-    const user = { id, name, phone: phone4, teamId: parseInt(teamId), joinDate: new Date().toISOString().slice(0,10), token };
+    const user = { id, name, phone: phone.slice(-4), teamId: parseInt(teamId), joinDate: new Date().toISOString().slice(0,10), token };
     users.push(user);
     this.setData("users", users);
     this.setData("currentUser", id);
