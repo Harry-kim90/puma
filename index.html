@@ -528,7 +528,7 @@ function renderRanking() {
   const maxScore = scores[0]?.total || 1;
   document.getElementById('rankSection').innerHTML = scores.map((t, i) => `
     <div class="rank-item">
-      <div class="rank-num ${i===0?'top':''}">0${i+1}</div>
+      <div class="rank-num ${i===0 ? 'top' : ''}">0${i+1}</div>
       <div class="rank-name"><span class="rank-dot" style="background:${t.color}"></span>${t.name}</div>
       <div class="rank-km">${t.totalKm.toFixed(1)}km</div>
       <div class="rank-score" style="color:${t.color}">${t.total.toFixed(1)}</div>
@@ -548,12 +548,12 @@ function renderMission() {
   const done2 = stats.some(t => t.totalKm >= (week * 30));
   document.getElementById('missionBody').innerHTML = `
     <div class="mission-row">
-      <div class="m-check ${done1?'done'}">✓</div>
-      <div class="m-text ${done1?'done'}">${mission.m1}</div>
+      <div class="m-check ${done1 ? 'done' : ''}">✓</div>
+      <div class="m-text ${done1 ? 'done' : ''}">${mission.m1}</div>
     </div>
     <div class="mission-row">
-      <div class="m-check ${done2?'done'}">✓</div>
-      <div class="m-text ${done2?'done'}">${mission.m2}</div>
+      <div class="m-check ${done2 ? 'done' : ''}">✓</div>
+      <div class="m-text ${done2 ? 'done' : ''}">${mission.m2}</div>
     </div>
     ${mission.bonus ? `<div class="mission-row">
       <div class="m-check" style="border-color:var(--c3);color:var(--c3)">★</div>
