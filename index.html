@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RUN TO COMPLETE SEOUL</title>
+<title>RUN PUMA FAM</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -31,7 +31,6 @@ body { min-height: 100vh; overflow-x: hidden; }
   padding: 3rem 1.5rem 2rem;
   overflow: hidden;
   border-bottom: 1px solid var(--border);
-  /* 수정된 부분: 배경 이미지 적용 */
   background-image: url('main-bg.jpg');
   background-size: cover;
   background-position: center;
@@ -260,9 +259,9 @@ body { min-height: 100vh; overflow-x: hidden; }
     <div>
       <div class="campaign-tag">런푸마팸 5기 · 6주 챌린지</div>
       <div class="hero-title">
-        <div class="glitch" data-text="RUN TO">RUN TO</div><br>
-        <div class="glitch" data-text="COMPLETE">COMPLETE</div><br>
-        <div class="glitch" data-text="SEOUL">SEOUL</div>
+        <div class="glitch" data-text="RUN">RUN</div><br>
+        <div class="glitch" data-text="PUMA">PUMA</div><br>
+        <div class="glitch" data-text="FAM">FAM</div>
       </div>
     </div>
     <div class="dday-badge">캠페인 목표<br><span id="dday">2026km</span></div>
@@ -272,7 +271,6 @@ body { min-height: 100vh; overflow-x: hidden; }
     <div class="nav-links">
       <a href="javascript:void(0)" onclick="APP.setData('currentUser', null); location.reload();">LOGOUT</a>
       <a href="history.html">MY LOG</a>
-      <a href="admin.html">ADMIN</a>
     </div>
   </div>
 </div>
@@ -369,230 +367,4 @@ body { min-height: 100vh; overflow-x: hidden; }
         <label>이름</label>
         <input type="text" id="logName" placeholder="홍길동">
       </div>
-      <div class="form-group">
-        <label>연락처 뒤 4자리</label>
-        <input type="text" id="logPhone" maxlength="4" placeholder="1234">
-      </div>
-      <div class="form-error" id="logError"></div>
-      <button class="form-btn" onclick="doLogin()">확인</button>
-      <div class="modal-toggle" onclick="toggleModal()">← 신규 등록</div>
-    </div>
-  </div>
-</div>
-
-<script src="app.js"></script>
-<script>
-// 1. app.js 로딩 및 에러 체크
-if (typeof APP === 'undefined') {
-  console.error("app.js 파일을 찾지 못했거나 오류가 있습니다.");
-} else {
-  APP.init();
-}
-
-let selectedTeamId = null;
-let isLoginMode = false;
-
-function toggleModal() {
-  isLoginMode = !isLoginMode;
-  document.getElementById('modalTitle').textContent = isLoginMode ? 'LOGIN' : 'REGISTER';
-  document.getElementById('registerForm').style.display = isLoginMode ? 'none' : 'block';
-  document.getElementById('loginForm').style.display   = isLoginMode ? 'block' : 'none';
-}
-
-function doRegister() {
-  const name = document.getElementById('regName').value.trim();
-  const phone = document.getElementById('regPhone').value.trim();
-  if (!name || !phone || phone.length < 4) { document.getElementById('regError').textContent = '이름과 연락처 4자리를 입력해주세요.'; return; }
-  if (selectedTeamId === null) { document.getElementById('regError').textContent = '팀을 선택해주세요.'; return; }
-  const r = APP.registerUser(name, phone, selectedTeamId);
-  if (!r.ok) { document.getElementById('regError').textContent = r.msg; return; }
-  document.getElementById('modalWrap').classList.add('hidden');
-  renderAll();
-}
-
-function doLogin() {
-  const name = document.getElementById('logName').value.trim();
-  const phone = document.getElementById('logPhone').value.trim();
-  const r = APP.loginUser(name, phone);
-  if (!r.ok) { document.getElementById('logError').textContent = r.msg; return; }
-  document.getElementById('modalWrap').classList.add('hidden');
-  renderAll();
-}
-
-function buildTeamChoices() {
-  const grid = document.getElementById('teamChoiceGrid');
-  if (!grid) return;
-  grid.innerHTML = APP.TEAMS.map(t =>
-    `<div class="team-choice" onclick="selectTeam(${t.id})" id="tc${t.id}">
-      <div class="tc-dot" style="background:${t.color}"></div>
-      <div class="tc-name">${t.name}</div>
-    </div>`
-  ).join('');
-}
-
-function selectTeam(id) {
-  selectedTeamId = id;
-  APP.TEAMS.forEach(t => {
-    const el = document.getElementById('tc'+t.id);
-    if(el) el.classList.remove('selected');
-  });
-  const target = document.getElementById('tc'+id);
-  if(target) target.classList.add('selected');
-}
-
-function renderAll() {
-  if (typeof APP === 'undefined') return;
-
-  const user = APP.getCurrentUser();
-  const modal = document.getElementById('modalWrap');
-
-  // 공개 섹션은 항상 렌더링
-  renderSeoul();
-  renderProgress();
-  renderRanking();
-  renderMission();
-
-  if (!user) {
-    modal.classList.remove('hidden');
-    buildTeamChoices();
-    document.getElementById('myTeamSection').style.display = 'none';
-    return;
-  }
-
-  modal.classList.add('hidden');
-  document.getElementById('myTeamSection').style.display = 'block';
-
-  const team = APP.TEAMS[user.teamId];
-  const chip = document.getElementById('userChip');
-  chip.textContent = `${user.name} · ${team.name}`;
-  chip.style.borderColor = team.color;
-  chip.style.color = team.color;
-
-  renderMyTeam(user);
-}
-
-function renderSeoul() {
-  const totalKm = APP.getTotalKm();
-  const pct = Math.min(100, (totalKm / APP.GOAL_KM) * 100);
-  document.getElementById('unlockPct').textContent = pct.toFixed(1) + '%';
-
-  const scores = APP.getTeamScores();
-  const totalScore = scores.reduce((s,t) => s + t.totalKm, 0) || 1;
-  scores.forEach(t => {
-    const el = document.getElementById('fillArea' + t.id);
-    if (!el) return;
-    const ratio = t.totalKm / totalScore;
-    el.querySelector('rect').setAttribute('opacity', (ratio * 0.25).toFixed(3));
-  });
-
-  const textEl = document.getElementById('seoulText');
-  const cleanOpacity = Math.min(0.9, 0.06 + pct / 100 * 0.84);
-  textEl.setAttribute('opacity', cleanOpacity.toFixed(2));
-
-  // Landmarks
-  const strip = document.getElementById('landmarkStrip');
-  strip.innerHTML = APP.LANDMARKS.map(lm => {
-    const unlocked = totalKm >= lm.km;
-    return `<div class="lm-item ${unlocked ? 'unlocked' : ''}">
-      <div class="lm-icon">${lm.icon}</div>
-      <div class="lm-name">${lm.name}</div>
-      <div class="lm-km">${lm.km.toLocaleString()}km</div>
-    </div>`;
-  }).join('');
-}
-
-function renderProgress() {
-  const totalKm = APP.getTotalKm();
-  const stats = APP.getTeamStats();
-  const pct = ((totalKm / APP.GOAL_KM) * 100).toFixed(1);
-  document.getElementById('progressRow').innerHTML = `
-    <div class="prog-block">
-      <div class="prog-label">TOTAL KM</div>
-      <div class="prog-value" style="color:var(--c0)">${totalKm.toFixed(1)}</div>
-      <div class="prog-sub">/ 2,026 km goal</div>
-    </div>
-    <div class="prog-block">
-      <div class="prog-label">UNLOCK</div>
-      <div class="prog-value" style="color:var(--c1)">${pct}%</div>
-      <div class="prog-sub">서울 해금률</div>
-    </div>
-    <div class="prog-block">
-      <div class="prog-label">RUNNERS</div>
-      <div class="prog-value" style="color:var(--c3)">${APP.getUsers().length}</div>
-      <div class="prog-sub">참가자</div>
-    </div>`;
-}
-
-function renderRanking() {
-  const scores = APP.getTeamScores();
-  const maxScore = scores[0]?.total || 1;
-  document.getElementById('rankSection').innerHTML = scores.map((t, i) => `
-    <div class="rank-item">
-      <div class="rank-num ${i===0 ? 'top' : ''}">0${i+1}</div>
-      <div class="rank-name"><span class="rank-dot" style="background:${t.color}"></span>${t.name}</div>
-      <div class="rank-km">${t.totalKm.toFixed(1)}km</div>
-      <div class="rank-score" style="color:${t.color}">${t.total.toFixed(1)}</div>
-      <div class="score-bar-wrap">
-        <div class="score-bar" style="width:${(t.total/maxScore*100).toFixed(1)}%;background:${t.color}"></div>
-      </div>
-    </div>`).join('');
-}
-
-function renderMission() {
-  const week = APP.getCurrentWeek();
-  const mission = APP.WEEKLY_MISSIONS[week - 1];
-  document.getElementById('weekLabel').textContent = `WEEK ${week}`;
-  const stats = APP.getTeamStats();
-  const totalKm = APP.getTotalKm();
-  const done1 = totalKm >= (week * 50);
-  const done2 = stats.some(t => t.totalKm >= (week * 30));
-  document.getElementById('missionBody').innerHTML = `
-    <div class="mission-row">
-      <div class="m-check ${done1 ? 'done' : ''}">✓</div>
-      <div class="m-text ${done1 ? 'done' : ''}">${mission.m1}</div>
-    </div>
-    <div class="mission-row">
-      <div class="m-check ${done2 ? 'done' : ''}">✓</div>
-      <div class="m-text ${done2 ? 'done' : ''}">${mission.m2}</div>
-    </div>
-    ${mission.bonus ? `<div class="mission-row">
-      <div class="m-check" style="border-color:var(--c3);color:var(--c3)">★</div>
-      <div class="m-text" style="color:var(--muted)">보너스: ${mission.bonus}</div>
-    </div>` : ''}`;
-}
-
-function renderMyTeam(user) {
-  const team = APP.TEAMS[user.teamId];
-  const stats = APP.getTeamStats().find(t => t.id === user.teamId);
-  const allUsers = APP.getUsers().filter(u => u.teamId === user.teamId);
-  const approved = APP.getApprovedRecords();
-  document.getElementById('myTeamName').textContent = team.name;
-  document.getElementById('myTeamName').style.color = team.color;
-
-  const totalTeamKm = stats?.totalKm || 0;
-  const contribPct = ((totalTeamKm / APP.GOAL_KM) * 100).toFixed(1);
-  document.getElementById('contribBar').innerHTML = `
-    <div class="contrib-label">
-      <span>팀 기여 거리</span>
-      <span style="color:${team.color}">${totalTeamKm.toFixed(1)}km</span>
-    </div>
-    <div class="contrib-track">
-      <div class="contrib-fill" style="width:${contribPct}%;background:${team.color}"></div>
-    </div>`;
-
-  document.getElementById('membersGrid').innerHTML = allUsers.map(u => {
-    const km = approved.filter(r => r.userId === u.id).reduce((s,r) => s+r.km, 0);
-    const initials = u.name.slice(0,1);
-    return `<div class="member-pill">
-      <div class="member-avatar" style="background:${team.color}22;color:${team.color}">${initials}</div>
-      <div class="member-name">${u.name}</div>
-      <div class="member-km">${km.toFixed(1)}km</div>
-    </div>`;
-  }).join('');
-}
-
-// 초기 화면 렌더링
-renderAll();
-</script>
-</body>
-</html>
+      <div class="form
