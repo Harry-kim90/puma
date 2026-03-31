@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RUN PUMA FAM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --surface: #111111;
+  --border: #222222;
+  --text: #f0f0f0;
+  --muted: #666;
+  --c0: #E8FF47;
+  --c1: #47FFD4;
+  --c2: #FF6B47;
+  --c3: #C447FF;
+  --mono: 'Space Mono', monospace;
+  --sans: 'Noto Sans KR', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--bg); color: var(--text); font-family: var(--sans); }
+body { min-height: 100vh; overflow-x: hidden; }
+
+/* ── GLITCH HEADER ── */
+.hero {
+  position: relative;
+  padding: 3rem 1.5rem 2rem;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+  background-image: url('main-bg.jpg');
+  background-size: cover;
+  background-position: center;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,.012) 2px, rgba(255,255,255,.012) 4px),
+    rgba(0, 0, 0, 0.58);
+  pointer-events: none;
+}
+.hero-grid {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  max-width: 700px; margin: 0 auto;
+}
+.campaign-tag {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 3px;
+  color: #fff; text-transform: uppercase; margin-bottom: .6rem;
+}
+.hero-title {
+  font-family: var(--mono); font-size: clamp(1.6rem, 6vw, 2.8rem);
+  font-weight: 700; line-height: 1.1; letter-spacing: -1px;
+  position: relative;
+}
+.hero-title .glitch {
+  position: relative; display: inline-block;
+  animation: glitch-flicker 4s infinite;
+}
+.hero-title .glitch::before,
+.hero-title .glitch::after {
+  content: attr(data-text); position: absolute; inset: 0;
+  clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+}
+.hero-title .glitch::before { color: var(--c2); animation: glitch-a 3s infinite; transform: translateX(-2px); }
+.hero-title .glitch::after  { color: var(--c1); clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%); animation: glitch-b 3s infinite; transform: translateX(2px); }
+@keyframes glitch-a { 0%,90%,100%{opacity:0} 91%,95%{opacity:.8} }
+@keyframes glitch-b { 0%,85%,100%{opacity:0} 86%,92%{opacity:.8} }
+@keyframes glitch-flicker { 0%,98%,100%{opacity:1} 99%{opacity:.85} }
+
+.dday-badge {
+  font-family: var(--mono); font-size: 11px;
+  border: 1px solid rgba(255,255,255,0.3); padding: .4rem .8rem;
+  color: #fff; white-space: nowrap; margin-top: .4rem;
+  background: rgba(0,0,0,0.4);
+}
+.dday-badge span { color: var(--c0); }
+
+/* ── USER BAR ── */
+.user-bar {
+  max-width: 700px; margin: 1.2rem auto 0;
+  display: flex; align-items: center; gap: .6rem; flex-wrap: wrap;
+  position: relative; z-index: 10;
+}
+.user-chip {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 1px;
+  padding: .3rem .8rem; border: 1px solid; border-radius: 2px;
+  background: rgba(0,0,0,0.6);
+}
+.nav-links { display: flex; gap: .5rem; margin-left: auto; }
+.nav-links a {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
+  color: #fff; text-decoration: none; padding: .3rem .6rem;
+  border: 1px solid rgba(255,255,255,0.3); transition: all .2s;
+  background: rgba(0,0,0,0.6);
+}
+.nav-links a:hover { color: var(--c0); border-color: var(--c0); }
+
+/* ── MAIN LAYOUT ── */
+.main { max-width: 700px; margin: 0 auto; padding: 1.5rem 1rem 6rem; }
+
+/* ── SEOUL UNLOCK VISUAL (IMAGE FILL) ── */
+.seoul-section {
+  border: 1px solid var(--border); margin-bottom: 1.5rem; position: relative; overflow: hidden;
+}
+.section-label {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 3px;
+  color: var(--muted); padding: .6rem 1rem; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.section-label .pct { color: var(--c0); }
+
+.seoul-canvas {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  /* 배경색만 남기고 이미지/블러 제거 */
+  background: #000;
+  overflow: hidden;
+}
+
+/* 새로운 이미지 클래스 정의 */
+.seoul-img-base, .seoul-img-fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* 베이스 이미지: 미해금 효과 (블러 + 약간의 흑백 + 어두움) */
+.seoul-img-base {
+  filter: blur(8px) grayscale(0.2) brightness(0.8);
+  z-index: 1; /* 밑에 위치 */
+}
+
+/* 오버레이 이미지: 해금 효과 (선명 + 왼쪽 Reveal) */
+.seoul-img-fill {
+  filter: none; /* 선명한 컬러 */
+  z-index: 2; /* 베이스 위에 위치 */
+  clip-path: inset(0 100% 0 0); /* 초기 상태: 100% 가려짐 (오른쪽 Reveal) */
+  transition: clip-path 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Scanline overlay (최상단, 레트로 느낌 유지) */
+.seoul-canvas::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,.3) 3px, rgba(0,0,0,.3) 4px);
+  z-index: 3; /* 최상단 */
+}
+
+/* ── PROGRESS ROW ── */
+.progress-row {
+  display: flex; gap: .8rem; margin-bottom: 1.5rem;
+}
+.prog-block {
+  flex: 1; border: 1px solid var(--border); padding: .8rem .9rem;
+}
+.prog-label { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 2px; margin-bottom: .4rem; }
+.prog-value { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; }
+.prog-sub   { font-family: var(--mono); font-size: 9px; color: var(--muted); margin-top: .2rem; }
+
+/* ── RANKING ── */
+.rank-section { margin-bottom: 1.5rem; }
+.rank-item {
+  display: grid; grid-template-columns: 2rem 1fr auto auto;
+  align-items: center; gap: .6rem;
+  padding: .9rem 1rem; border: 1px solid var(--border); border-bottom: none;
+  transition: background .2s;
+}
+.rank-item:last-child { border-bottom: 1px solid var(--border); }
+.rank-item:hover { background: rgba(255,255,255,.02); }
+.rank-num {
+  font-family: var(--mono); font-size: 1rem; font-weight: 700; color: var(--border);
+}
+.rank-num.top { color: var(--c0); }
+.rank-name { font-size: .85rem; font-weight: 500; }
+.rank-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: .4rem; }
+.rank-km { font-family: var(--mono); font-size: .75rem; color: var(--muted); }
+.rank-score { font-family: var(--mono); font-size: 1rem; font-weight: 700; }
+
+.score-bar-wrap { grid-column: 1/-1; height: 2px; background: var(--border); margin-top: .3rem; }
+.score-bar { height: 100%; transition: width .8s ease; }
+
+/* ── MISSION CARD ── */
+.mission-section { border: 1px solid var(--border); margin-bottom: 1.5rem; }
+.mission-header { padding: .7rem 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.mission-week { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+.mission-body { padding: .8rem 1rem; display: flex; flex-direction: column; gap: .6rem; }
+.mission-row { display: flex; align-items: center; gap: .6rem; }
+.m-check { width: 16px; height: 16px; border: 1px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+.m-check.done { border-color: var(--c0); color: var(--c0); background: rgba(232,255,71,.1); }
+.m-text { font-size: .8rem; color: var(--muted); }
+.m-text.done { color: var(--text); }
+
+/* ── MY TEAM ── */
+.my-team-section { border: 1px solid var(--border); margin-bottom: 1.5rem; display: none; }
+.contrib-bar-wrap { padding: .8rem 1rem; }
+.contrib-label { display: flex; justify-content: space-between; margin-bottom: .5rem; }
+.contrib-label span { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+.contrib-track { height: 4px; background: var(--border); margin-bottom: .8rem; }
+.contrib-fill { height: 100%; }
+.members-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; padding: 0 1rem .8rem; }
+.member-pill {
+  display: flex; align-items: center; gap: .5rem; padding: .5rem .7rem;
+  background: rgba(255,255,255,.02); border: 1px solid var(--border);
+}
+.member-avatar { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 9px; font-weight: 700; flex-shrink: 0; }
+.member-name { font-size: .75rem; }
+.member-km { font-family: var(--mono); font-size: .7rem; color: var(--muted); margin-left: auto; }
+
+/* ── FAB ── */
+.fab {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 100;
+  background: var(--c0); color: #000; font-family: var(--mono);
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  padding: .9rem 1.4rem; text-decoration: none;
+  border: none; cursor: pointer;
+  box-shadow: 0 0 30px rgba(232,255,71,.4);
+  transition: all .2s; display: flex; align-items: center; gap: .5rem;
+}
+.fab:hover { background: #fff; box-shadow: 0 0 40px rgba(255,255,255,.3); }
+.fab-dot { width: 6px; height: 6px; background: #000; border-radius: 50%; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ── REGISTER MODAL ── */
+.modal-wrap {
+  position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 200;
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+}
+.modal-wrap.hidden { display: none; }
+.modal {
+  background: var(--surface); border: 1px solid var(--border);
+  max-width: 400px; width: 100%; padding: 1.5rem;
+}
+.modal h2 { font-family: var(--mono); font-size: 1rem; margin-bottom: 1rem; }
+.form-group { margin-bottom: .8rem; }
+.form-group label { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; display: block; margin-bottom: .3rem; }
+.form-group input, .form-group select {
+  width: 100%; background: var(--bg); border: 1px solid var(--border);
+  color: var(--text); font-family: var(--sans); font-size: .85rem;
+  padding: .6rem .8rem; outline: none;
+}
+.form-group input:focus, .form-group select:focus { border-color: var(--c0); }
+.form-group select option { background: #111; }
+.team-choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.team-choice {
+  padding: .7rem; border: 1px solid var(--border); cursor: pointer;
+  text-align: center; transition: all .2s;
+}
+.team-choice.selected { border-color: var(--text); background: rgba(255,255,255,.05); }
+.team-choice .tc-name { font-size: .8rem; font-weight: 500; }
+.team-choice .tc-dot { width: 8px; height: 8px; border-radius: 50%; margin: 0 auto .4rem; }
+.form-btn {
+  width: 100%; background: var(--c0); color: #000; font-family: var(--mono);
+  font-size: 11px; font-weight: 700; letter-spacing: 2px; padding: .8rem;
+  border: none; cursor: pointer; margin-top: .5rem; transition: all .2s;
+}
+.form-btn:hover { background: #fff; }
+.modal-toggle { font-family: var(--mono); font-size: 10px; color: var(--muted); text-align: center; margin-top: .8rem; cursor: pointer; }
+.modal-toggle:hover { color: var(--text); }
+.form-error { font-family: var(--mono); font-size: 10px; color: var(--c2); margin-top: .5rem; min-height: 14px; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid">
+    <div>
+      <div class="campaign-tag">런푸마팸 5기 · 6주 챌린지</div>
+      <div class="hero-title">
+        <div class="glitch" data-text="RUN">RUN</div><br>
+        <div class="glitch" data-text="PUMA">PUMA</div><br>
+        <div class="glitch" data-text="FAM">FAM</div>
+      </div>
+    </div>
+    <div class="dday-badge">캠페인 목표<br><span id="dday">2026km</span></div>
+  </div>
+  <div class="user-bar">
+    <div class="user-chip" id="userChip" style="border-color:var(--border);color:var(--muted)">로그인 필요</div>
+    <div class="nav-links">
+      <a href="javascript:void(0)" onclick="if(typeof APP !== 'undefined'){ APP.setData('currentUser', null); location.reload(); }">LOGOUT</a>
+      <a href="history.html">MY LOG</a>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="seoul-section">
+    <div class="section-label">
+      <span>SEOUL UNLOCK</span>
+      <span class="pct" id="unlockPct">0%</span>
+    </div>
+    
+    <div class="seoul-canvas" id="seoulCanvas">
+      <img src="seoul-bg.jpg" class="seoul-img-base" alt="Seoul Base">
+      <img src="seoul-bg.jpg" class="seoul-img-fill" id="seoulImgFill" alt="Seoul Fill">
+    </div>
+  </div>
+
+  <div class="progress-row" id="progressRow"></div>
+
+  <div class="section-label" style="border:1px solid var(--border);border-bottom:none;padding:.6rem 1rem;margin-bottom:0">
+    <span>TEAM RANKING</span>
+    <span style="font-size:8px;color:var(--muted)">승인 기록 기준</span>
+  </div>
+  <div class="rank-section" id="rankSection"></div>
+
+  <div class="mission-section">
+    <div class="mission-header">
+      <span class="section-label" style="border:none;padding:0">WEEKLY MISSION</span>
+      <span class="mission-week" id="weekLabel">WEEK 1</span>
+    </div>
+    <div class="mission-body" id="missionBody"></div>
+  </div>
+
+  <div class="my-team-section" id="myTeamSection">
+    <div class="section-label" style="border-bottom:1px solid var(--border)">
+      <span>MY TEAM</span>
+      <span id="myTeamName" style="font-size:10px"></span>
+    </div>
+    <div class="contrib-bar-wrap" id="contribBar"></div>
+    <div class="members-grid" id="membersGrid"></div>
+  </div>
+</div>
+
+<a class="fab" href="submit.html">
+  <div class="fab-dot"></div>
+  기록 제출
+</a>
+
+<div class="modal-wrap" id="modalWrap">
+  <div class="modal">
+    <h2 id="modalTitle">REGISTER</h2>
+    <div id="registerForm">
+      <div class="form-group">
+        <label>이름</label>
+        <input type="text" id="regName" placeholder="홍길동">
+      </div>
+      <div class="form-group">
+        <label>연락처 뒤 4자리</label>
+        <input type="text" id="regPhone" maxlength="4" placeholder="1234">
+      </div>
+      <div class="form-group">
+        <label>팀 선택</label>
+        <div class="team-choice-grid" id="teamChoiceGrid"></div>
+      </div>
+      <div class="form-error" id="regError"></div>
+      <button class="form-btn" onclick="doRegister()">참가 등록</button>
+      <div class="modal-toggle" onclick="toggleModal()">이미 등록했어요 → 로그인</div>
+    </div>
+    <div id="loginForm" style="display:none">
+      <div class="form-group">
+        <label>이름</label>
+        <input type="text" id="logName" placeholder="홍길동">
+      </div>
+      <div class="form-group">
+        <label>연락처 뒤 4자리</label>
+        <input type="text" id="logPhone" maxlength="4" placeholder="1234">
+      </div>
+      <div class="form-error" id="logError"></div>
+      <button class="form-btn" onclick="doLogin()">확인</button>
+      <div class="modal-toggle" onclick="toggleModal()">← 신규 등록</div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+let selectedTeamId = null;
+let isLoginMode = false;
+
+function toggleModal() {
+  isLoginMode = !isLoginMode;
+  document.getElementById('modalTitle').textContent = isLoginMode ? 'LOGIN' : 'REGISTER';
+  document.getElementById('registerForm').style.display = isLoginMode ? 'none' : 'block';
+  document.getElementById('loginForm').style.display   = isLoginMode ? 'block' : 'none';
+}
+
+function doRegister() {
+  const name = document.getElementById('regName').value.trim();
+  const phone = document.getElementById('regPhone').value.trim();
+  if (!name || !phone || phone.length < 4) { document.getElementById('regError').textContent = '이름과 연락처 4자리를 입력해주세요.'; return; }
+  if (selectedTeamId === null) { document.getElementById('regError').textContent = '팀을 선택해주세요.'; return; }
+  const r = APP.registerUser(name, phone, selectedTeamId);
+  if (!r.ok) { document.getElementById('regError').textContent = r.msg; return; }
+  document.getElementById('modalWrap').classList.add('hidden');
+  renderAll();
+}
+
+function doLogin() {
+  const name = document.getElementById('logName').value.trim();
+  const phone = document.getElementById('logPhone').value.trim();
+  const r = APP.loginUser(name, phone);
+  if (!r.ok) { document.getElementById('logError').textContent = r.msg; return; }
+  document.getElementById('modalWrap').classList.add('hidden');
+  renderAll();
+}
+
+function buildTeamChoices() {
+  const grid = document.getElementById('teamChoiceGrid');
+  if (!grid) return;
+  grid.innerHTML = APP.TEAMS.map(t =>
+    `<div class="team-choice" onclick="selectTeam(${t.id})" id="tc${t.id}">
+      <div class="tc-dot" style="background:${t.color}"></div>
+      <div class="tc-name">${t.name}</div>
+    </div>`
+  ).join('');
+}
+
+function selectTeam(id) {
+  selectedTeamId = id;
+  APP.TEAMS.forEach(t => {
+    const el = document.getElementById('tc'+t.id);
+    if(el) el.classList.remove('selected');
+  });
+  const target = document.getElementById('tc'+id);
+  if(target) target.classList.add('selected');
+}
+
+function renderAll() {
+  const modal = document.getElementById('modalWrap');
+
+  if (typeof APP === 'undefined') {
+    document.getElementById('modalTitle').textContent = 'SYSTEM ERROR';
+    document.getElementById('registerForm').innerHTML = `
+      <div style="color:var(--c2); font-size:12px; line-height:1.6; padding: 1rem 0;">
+        🚨 <b>app.js 파일 로드 실패</b><br><br>
+        GitHub 서버에서 자바스크립트 파일을 찾지 못해 페이지가 정지되었습니다.<br><br>
+        <b>해결 방법:</b><br>
+        1. GitHub 레포지토리에 파일이 잘 올라갔는지 확인하세요.<br>
+        2. 파일 이름이 정확히 <b>app.js</b> (전부 소문자)인지 확인하세요.
+      </div>`;
+    document.getElementById('loginForm').style.display = 'none';
+    return;
+  }
+
+  APP.init();
+  const user = APP.getCurrentUser();
+
+  renderSeoul();
+  renderProgress();
+  renderRanking();
+  renderMission();
+
+  if (!user) {
+    modal.classList.remove('hidden');
+    buildTeamChoices();
+    document.getElementById('myTeamSection').style.display = 'none';
+    return;
+  }
+
+  modal.classList.add('hidden');
+  document.getElementById('myTeamSection').style.display = 'block';
+
+  const team = APP.TEAMS[user.teamId];
+  const chip = document.getElementById('userChip');
+  chip.textContent = `${user.name} · ${team.name}`;
+  chip.style.borderColor = team.color;
+  chip.style.color = team.color;
+
+  renderMyTeam(user);
+}
+
+function renderSeoul() {
+  const totalKm = APP.getTotalKm();
+  const pct = Math.min(100, (totalKm / APP.GOAL_KM) * 100);
+  document.getElementById('unlockPct').textContent = pct.toFixed(1) + '%';
+
+  // 핵심 수정: 이미지 마스크 업데이트 (Reveal 방식: inset 조절)
+  const fillImg = document.getElementById('seoulImgFill');
+  if (fillImg) {
+    // 기존 div의 width 조절에서 img의 clip-path inset 조절로 변경
+    // inset(top right bottom left) -> inset(0 [달성비율만큼 미해금 영역 가림] 0 0)
+    fillImg.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+  }
+}
+
+function renderProgress() {
+  const totalKm = APP.getTotalKm();
+  const pct = ((totalKm / APP.GOAL_KM) * 100).toFixed(1);
+  document.getElementById('progressRow').innerHTML = `
+    <div class="prog-block">
+      <div class="prog-label">TOTAL KM</div>
+      <div class="prog-value" style="color:var(--c0)">${totalKm.toFixed(1)}</div>
+      <div class="prog-sub">/ 2,026 km goal</div>
+    </div>
+    <div class="prog-block">
+      <div class="prog-label">UNLOCK</div>
+      <div class="prog-value" style="color:var(--c1)">${pct}%</div>
+      <div class="prog-sub">서울 해금률</div>
+    </div>
+    <div class="prog-block">
+      <div class="prog-label">RUNNERS</div>
+      <div class="prog-value" style="color:var(--c3)">${APP.getUsers().length}</div>
+      <div class="prog-sub">참가자</div>
+    </div>`;
+}
+
+function renderRanking() {
+  const scores = APP.getTeamScores();
+  const maxScore = scores[0]?.total || 1;
+  document.getElementById('rankSection').innerHTML = scores.map((t, i) => `
+    <div class="rank-item">
+      <div class="rank-num ${i===0 ? 'top' : ''}">0${i+1}</div>
+      <div class="rank-name"><span class="rank-dot" style="background:${t.color}"></span>${t.name}</div>
+      <div class="rank-km">${t.totalKm.toFixed(1)}km</div>
+      <div class="rank-score" style="color:${t.color}">${t.total.toFixed(1)}</div>
+      <div class="score-bar-wrap">
+        <div class="score-bar" style="width:${(t.total/maxScore*100).toFixed(1)}%;background:${t.color}"></div>
+      </div>
+    </div>`).join('');
+}
+
+function renderMission() {
+  const week = APP.getCurrentWeek();
+  const mission = APP.WEEKLY_MISSIONS[week - 1];
+  document.getElementById('weekLabel').textContent = `WEEK ${week}`;
+  const stats = APP.getTeamStats();
+  const totalKm = APP.getTotalKm();
+  const done1 = totalKm >= (week * 50);
+  const done2 = stats.some(t => t.totalKm >= (week * 30));
+  document.getElementById('missionBody').innerHTML = `
+    <div class="mission-row">
+      <div class="m-check ${done1 ? 'done' : ''}">✓</div>
+      <div class="m-text ${done1 ? 'done' : ''}">${mission.m1}</div>
+    </div>
+    <div class="mission-row">
+      <div class="m-check ${done2 ? 'done' : ''}">✓</div>
+      <div class="m-text ${done2 ? 'done' : ''}">${mission.m2}</div>
+    </div>
+    ${mission.bonus ? `<div class="mission-row">
+      <div class="m-check" style="border-color:var(--c3);color:var(--c3)">★</div>
+      <div class="m-text" style="color:var(--muted)">보너스: ${mission.bonus}</div>
+    </div>` : ''}`;
+}
+
+function renderMyTeam(user) {
+  const team = APP.TEAMS[user.teamId];
+  const stats = APP.getTeamStats().find(t => t.id === user.teamId);
+  const allUsers = APP.getUsers().filter(u => u.teamId === user.teamId);
+  const approved = APP.getApprovedRecords();
+  document.getElementById('myTeamName').textContent = team.name;
+  document.getElementById('myTeamName').style.color = team.color;
+
+  const totalTeamKm = stats?.totalKm || 0;
+  const contribPct = ((totalTeamKm / APP.GOAL_KM) * 100).toFixed(1);
+  document.getElementById('contribBar').innerHTML = `
+    <div class="contrib-label">
+      <span>팀 기여 거리</span>
+      <span style="color:${team.color}">${totalTeamKm.toFixed(1)}km</span>
+    </div>
+    <div class="contrib-track">
+      <div class="contrib-fill" style="width:${contribPct}%;background:${team.color}"></div>
+    </div>`;
+
+  document.getElementById('membersGrid').innerHTML = allUsers.map(u => {
+    const km = approved.filter(r => r.userId === u.id).reduce((s,r) => s+r.km, 0);
+    const initials = u.name.slice(0,1);
+    return `<div class="member-pill">
+      <div class="member-avatar" style="background:${team.color}22;color:${team.color}">${initials}</div>
+      <div class="member-name">${u.name}</div>
+      <div class="member-km">${km.toFixed(1)}km</div>
+    </div>`;
+  }).join('');
+}
+
+// 초기 화면 렌더링
+renderAll();
+</script>
+</body>
+</html>

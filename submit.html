@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기록 제출 · RUN TO COMPLETE SEOUL</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a; --surface: #111; --border: #222; --text: #f0f0f0;
+  --muted: #666; --c0: #E8FF47; --c1: #47FFD4; --c2: #FF6B47; --c3: #C447FF;
+  --mono: 'Space Mono', monospace; --sans: 'Noto Sans KR', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--bg); color: var(--text); font-family: var(--sans); }
+body { min-height: 100vh; }
+
+.topbar {
+  display: flex; align-items: center; gap: .8rem;
+  padding: 1rem 1.2rem; border-bottom: 1px solid var(--border);
+}
+.back-btn {
+  font-family: var(--mono); font-size: 11px; color: var(--muted);
+  text-decoration: none; letter-spacing: 1px; transition: color .2s;
+}
+.back-btn:hover { color: var(--text); }
+.topbar-title { font-family: var(--mono); font-size: 11px; letter-spacing: 3px; color: var(--muted); }
+
+.wrap { max-width: 500px; margin: 0 auto; padding: 2rem 1.2rem 4rem; }
+
+.form-title { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; margin-bottom: .3rem; }
+.form-sub { font-size: .8rem; color: var(--muted); margin-bottom: 2rem; }
+
+.field { margin-bottom: 1.2rem; }
+.field label {
+  display: block; font-family: var(--mono); font-size: 9px;
+  letter-spacing: 3px; color: var(--muted); margin-bottom: .5rem;
+}
+.field input[type=text],
+.field input[type=date],
+.field input[type=number],
+.field textarea {
+  width: 100%; background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); font-family: var(--sans); font-size: .9rem;
+  padding: .75rem .9rem; outline: none; transition: border-color .2s;
+  -webkit-appearance: none; appearance: none;
+}
+.field input:focus, .field textarea:focus { border-color: var(--c0); }
+.field textarea { resize: vertical; min-height: 70px; }
+
+/* km input */
+.km-row { display: flex; align-items: stretch; gap: .5rem; }
+.km-row input { flex: 1; }
+.km-unit {
+  background: var(--border); border: 1px solid var(--border);
+  font-family: var(--mono); font-size: 11px; color: var(--muted);
+  padding: 0 1rem; display: flex; align-items: center;
+}
+.km-quickbtn-row { display: flex; gap: .4rem; margin-top: .5rem; flex-wrap: wrap; }
+.km-quick {
+  font-family: var(--mono); font-size: 10px; padding: .3rem .7rem;
+  border: 1px solid var(--border); background: transparent; color: var(--muted);
+  cursor: pointer; transition: all .2s;
+}
+.km-quick:hover { border-color: var(--c0); color: var(--c0); }
+
+/* Screenshot upload */
+.upload-area {
+  border: 1px dashed var(--border); padding: 2rem 1rem;
+  text-align: center; cursor: pointer; transition: all .2s; position: relative;
+}
+.upload-area:hover, .upload-area.drag { border-color: var(--c0); background: rgba(232,255,71,.03); }
+.upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.upload-icon { font-size: 2rem; margin-bottom: .5rem; opacity: .3; }
+.upload-text { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+.upload-hint { font-size: .75rem; color: #444; margin-top: .4rem; }
+.upload-preview { margin-top: .8rem; display: none; }
+.upload-preview img { max-width: 100%; max-height: 180px; object-fit: contain; border: 1px solid var(--border); }
+.upload-filename { font-family: var(--mono); font-size: 10px; color: var(--c1); margin-top: .3rem; }
+
+/* Warning */
+.warning-box {
+  background: rgba(255,107,71,.08); border: 1px solid rgba(255,107,71,.3);
+  padding: .7rem .9rem; margin-bottom: 1rem;
+  font-family: var(--mono); font-size: 10px; color: var(--c2);
+  display: none; align-items: center; gap: .5rem;
+}
+.warning-box.show { display: flex; }
+
+/* Daily limit notice */
+.limit-notice {
+  background: rgba(255,255,255,.03); border: 1px solid var(--border);
+  padding: .6rem .9rem; margin-bottom: 1.5rem;
+  font-family: var(--mono); font-size: 9px; color: var(--muted);
+  display: flex; gap: 1rem;
+}
+
+/* Submit btn */
+.submit-btn {
+  width: 100%; background: var(--c0); color: #000;
+  font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: 3px;
+  padding: 1rem; border: none; cursor: pointer; transition: all .2s; margin-top: .5rem;
+}
+.submit-btn:hover { background: #fff; }
+.submit-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+.form-error { font-family: var(--mono); font-size: 10px; color: var(--c2); margin-top: .5rem; min-height: 14px; }
+
+/* SUCCESS STATE */
+.success-screen {
+  text-align: center; padding: 3rem 1rem; display: none;
+}
+.success-icon { font-size: 3rem; margin-bottom: 1rem; animation: pop .4s ease; }
+@keyframes pop { 0%{transform:scale(0.5);opacity:0} 70%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+.success-title { font-family: var(--mono); font-size: 1.2rem; font-weight: 700; color: var(--c0); margin-bottom: .5rem; }
+.success-sub { font-size: .85rem; color: var(--muted); margin-bottom: 2rem; line-height: 1.6; }
+.success-detail {
+  background: var(--surface); border: 1px solid var(--border);
+  padding: 1rem; margin-bottom: 1.5rem; text-align: left;
+}
+.success-row { display: flex; justify-content: space-between; margin-bottom: .4rem; }
+.success-row:last-child { margin: 0; }
+.success-row span:first-child { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+.success-row span:last-child { font-family: var(--mono); font-size: 10px; color: var(--text); }
+.flag-notice {
+  background: rgba(255,107,71,.08); border: 1px solid rgba(255,107,71,.3);
+  padding: .7rem; font-family: var(--mono); font-size: 10px; color: var(--c2);
+  margin-bottom: 1rem; display: none;
+}
+.home-btn {
+  display: inline-block; font-family: var(--mono); font-size: 11px; letter-spacing: 2px;
+  padding: .8rem 2rem; border: 1px solid var(--border); color: var(--muted);
+  text-decoration: none; transition: all .2s;
+}
+.home-btn:hover { border-color: var(--text); color: var(--text); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="back-btn">← BACK</a>
+  <div class="topbar-title">RECORD SUBMIT</div>
+</div>
+
+<div class="wrap">
+
+  <!-- FORM -->
+  <div id="formSection">
+    <div class="form-title">기록 제출</div>
+    <div class="form-sub">러닝 후 거리와 스크린샷을 제출해주세요</div>
+
+    <div class="limit-notice">
+      <span>⚠ 1일 1회 제출 제한</span>
+      <span>|</span>
+      <span>50km 초과 시 검수 보류</span>
+    </div>
+
+    <div class="field">
+      <label>러닝 날짜</label>
+      <input type="date" id="runDate">
+    </div>
+
+    <div class="field">
+      <label>거리 (km)</label>
+      <div class="km-row">
+        <input type="number" id="kmInput" min="0.1" max="200" step="0.1" placeholder="0.0" oninput="checkKm()">
+        <div class="km-unit">KM</div>
+      </div>
+      <div class="km-quickbtn-row">
+        <button class="km-quick" onclick="setKm(5)">5km</button>
+        <button class="km-quick" onclick="setKm(10)">10km</button>
+        <button class="km-quick" onclick="setKm(15)">15km</button>
+        <button class="km-quick" onclick="setKm(21.1)">하프</button>
+        <button class="km-quick" onclick="setKm(42.195)">풀마</button>
+      </div>
+    </div>
+
+    <div class="warning-box" id="warningBox">
+      ⚠ 50km 초과 기록은 비정상 의심으로 분류되어 별도 검수됩니다
+    </div>
+
+    <div class="field">
+      <label>스크린샷 업로드 (필수)</label>
+      <div class="upload-area" id="uploadArea">
+        <input type="file" accept="image/*" id="fileInput" onchange="handleFile(this)">
+        <div class="upload-icon">📱</div>
+        <div class="upload-text">TAP TO UPLOAD</div>
+        <div class="upload-hint">나이키런 · 가민 · 스트라바 · 애플 피트니스</div>
+        <div class="upload-preview" id="uploadPreview">
+          <img id="previewImg" src="" alt="preview">
+          <div class="upload-filename" id="fileName"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>메모 (선택)</label>
+      <textarea id="memo" placeholder="오늘의 러닝 한줄 기록 (최대 100자)" maxlength="100"></textarea>
+    </div>
+
+    <div class="form-error" id="formError"></div>
+    <button class="submit-btn" id="submitBtn" onclick="doSubmit()">제출하기</button>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✓</div>
+    <div class="success-title">제출 완료!</div>
+    <div class="success-sub">기록이 검수 대기 상태로 저장됐어요.<br>운영자 승인 후 점수에 반영됩니다.</div>
+    <div class="success-detail" id="successDetail"></div>
+    <div class="flag-notice" id="flagNotice">⚠ 50km 초과 기록으로 표시되어 별도 검수됩니다</div>
+    <a href="index.html" class="home-btn">대시보드로 →</a>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+<script>
+APP.init();
+
+// 로그인 여부 확인 후 안내 배너 표시
+const user = APP.getCurrentUser();
+if (!user) {
+  const notice = document.createElement('div');
+  notice.style.cssText = 'background:rgba(255,107,71,.12);border:1px solid rgba(255,107,71,.35);font-family:var(--mono);font-size:10px;color:#FF6B47;padding:.7rem .9rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:.6rem;';
+  notice.innerHTML = '⚠ 대시보드에서 먼저 등록/로그인해주세요 &nbsp;·&nbsp; <a href="index.html" style="color:#FF6B47;text-decoration:underline;">등록하러 가기 →</a>';
+  document.querySelector('.wrap').prepend(notice);
+}
+const today = new Date().toISOString().slice(0, 10);
+document.getElementById('runDate').value = today;
+document.getElementById('runDate').max = today;
+
+let uploadedFile = null;
+
+function setKm(val) {
+  document.getElementById('kmInput').value = val;
+  checkKm();
+}
+
+function checkKm() {
+  const km = parseFloat(document.getElementById('kmInput').value);
+  document.getElementById('warningBox').classList.toggle('show', km > 50);
+}
+
+function handleFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  uploadedFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('previewImg').src = e.target.result;
+    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('uploadPreview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+// Drag & drop
+const ua = document.getElementById('uploadArea');
+ua.addEventListener('dragover', e => { e.preventDefault(); ua.classList.add('drag'); });
+ua.addEventListener('dragleave', () => ua.classList.remove('drag'));
+ua.addEventListener('drop', e => {
+  e.preventDefault(); ua.classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    uploadedFile = file;
+    const dt = new DataTransfer(); dt.items.add(file);
+    document.getElementById('fileInput').files = dt.files;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      document.getElementById('previewImg').src = ev.target.result;
+      document.getElementById('fileName').textContent = file.name;
+      document.getElementById('uploadPreview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+function doSubmit() {
+  const user = APP.getCurrentUser();
+  if (!user) { document.getElementById('formError').textContent = '먼저 대시보드에서 등록해주세요.'; return; }
+
+  const date = document.getElementById('runDate').value;
+  const km = parseFloat(document.getElementById('kmInput').value);
+  const error = document.getElementById('formError');
+
+  if (!date) { error.textContent = '날짜를 선택해주세요.'; return; }
+  if (!km || km <= 0) { error.textContent = '거리를 입력해주세요.'; return; }
+  if (!uploadedFile) { error.textContent = '스크린샷을 업로드해주세요.'; return; }
+
+  error.textContent = '';
+  document.getElementById('submitBtn').disabled = true;
+
+  const result = APP.submitRecord(user.id, date, km, uploadedFile?.name || 'screenshot.jpg');
+
+  if (!result.ok) {
+    error.textContent = result.msg;
+    document.getElementById('submitBtn').disabled = false;
+    return;
+  }
+
+  // Show success
+  document.getElementById('formSection').style.display = 'none';
+  const s = document.getElementById('successScreen');
+  s.style.display = 'block';
+
+  const team = APP.TEAMS[user.teamId];
+  document.getElementById('successDetail').innerHTML = `
+    <div class="success-row"><span>제출자</span><span>${user.name}</span></div>
+    <div class="success-row"><span>팀</span><span style="color:${team.color}">${team.name}</span></div>
+    <div class="success-row"><span>날짜</span><span>${date}</span></div>
+    <div class="success-row"><span>거리</span><span>${km.toFixed(1)} km</span></div>
+    <div class="success-row"><span>상태</span><span style="color:var(--muted)">검수 대기</span></div>`;
+
+  if (result.flagAbnormal) {
+    document.getElementById('flagNotice').style.display = 'block';
+  }
+}
+</script>
+</body>
+</html>
