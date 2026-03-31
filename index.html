@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RUN PUMA FAM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --surface: #111111;
+  --border: #222222;
+  --text: #f0f0f0;
+  --muted: #666;
+  --c0: #E8FF47;
+  --c1: #47FFD4;
+  --c2: #FF6B47;
+  --c3: #C447FF;
+  --mono: 'Space Mono', monospace;
+  --sans: 'Noto Sans KR', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--bg); color: var(--text); font-family: var(--sans); }
+body { min-height: 100vh; overflow-x: hidden; }
+
+/* ── GLITCH HEADER ── */
+.hero {
+  position: relative;
+  padding: 3rem 1.5rem 2rem;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+  background-image: url('main-bg.jpg');
+  background-size: cover;
+  background-position: center;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,.012) 2px, rgba(255,255,255,.012) 4px),
+    rgba(0, 0, 0, 0.58);
+  pointer-events: none;
+}
+.hero-grid {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  max-width: 700px; margin: 0 auto;
+}
+.campaign-tag {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 3px;
+  color: #fff; text-transform: uppercase; margin-bottom: .6rem;
+}
+.hero-title {
+  font-family: var(--mono); font-size: clamp(1.6rem, 6vw, 2.8rem);
+  font-weight: 700; line-height: 1.1; letter-spacing: -1px;
+  position: relative;
+}
+.hero-title .glitch {
+  position: relative; display: inline-block;
+  animation: glitch-flicker 4s infinite;
+}
+.hero-title .glitch::before,
+.hero-title .glitch::after {
+  content: attr(data-text); position: absolute; inset: 0;
+  clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+}
+.hero-title .glitch::before { color: var(--c2); animation: glitch-a 3s infinite; transform: translateX(-2px); }
+.hero-title .glitch::after  { color: var(--c1); clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%); animation: glitch-b 3s infinite; transform: translateX(2px); }
+@keyframes glitch-a { 0%,90%,100%{opacity:0} 91%,95%{opacity:.8} }
+@keyframes glitch-b { 0%,85%,100%{opacity:0} 86%,92%{opacity:.8} }
+@keyframes glitch-flicker { 0%,98%,100%{opacity:1} 99%{opacity:.85} }
+
+.dday-badge {
+  font-family: var(--mono); font-size: 11px;
+  border: 1px solid rgba(255,255,255,0.3); padding: .4rem .8rem;
+  color: #fff; white-space: nowrap; margin-top: .4rem;
+  background: rgba(0,0,0,0.4);
+}
+.dday-badge span { color: var(--c0); }
+
+/* ── USER BAR ── */
+.user-bar {
+  max-width: 700px; margin: 1.2rem auto 0;
+  display: flex; align-items: center; gap: .6rem; flex-wrap: wrap;
+  position: relative; z-index: 10;
+}
+.user-chip {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 1px;
+  padding: .3rem .8rem; border: 1px solid; border-radius: 2px;
+  background: rgba(0,0,0,0.6);
+}
+.nav-links { display: flex; gap: .5rem; margin-left: auto; }
+.nav-links a {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
+  color: #fff; text-decoration: none; padding: .3rem .6rem;
+  border: 1px solid rgba(255,255,255,0.3); transition: all .2s;
+  background: rgba(0,0,0,0.6);
+}
+.nav-links a:hover { color: var(--c0); border-color: var(--c0); }
+
+/* ── MAIN LAYOUT ── */
+.main { max-width: 700px; margin: 0 auto; padding: 1.5rem 1rem 6rem; }
+
+/* ── SEOUL UNLOCK VISUAL (IMAGE FILL) ── */
+.seoul-section {
+  border: 1px solid var(--border); margin-bottom: 1.5rem; position: relative; overflow: hidden;
+}
+.section-label {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 3px;
+  color: var(--muted); padding: .6rem 1rem; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.section-label .pct { color: var(--c0); }
+
+.seoul-canvas {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  /* 기본 배경: 흐린 흑백 이미지 */
+  background-image: url('seoul-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(1) brightness(0.3);
+  overflow: hidden;
+}
+
+/* 위에 덮어씌워질 원본 컬러 이미지 영역 */
+.seoul-canvas .overlay-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%; /* 초기 상태: 너비 0% */
+  background-image: url('seoul-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  filter: none; /* 필터 없음 (컬러) */
+  transition: width 1.5s ease; /* 너비 변화에 애니메이션 적용 */
+}
+
+/* Scanline overlay (레트로 느낌 유지) */
+.seoul-canvas::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,.3) 3px, rgba(0,0,0,.3) 4px);
+  z-index: 2; /* 최상단 */
+}
+
+.landmark-strip {
+  display: flex; border-top: 1px solid var(--border);
+}
+.lm-item {
+  flex: 1; padding: .6rem .5rem; text-align: center;
+  border-right: 1px solid var(--border); position: relative;
+  transition: background .4s;
+}
+.lm-item:last-child { border-right: none; }
+.lm-icon { font-size: 14px; line-height: 1; margin-bottom: .2rem; filter: grayscale(1); opacity: .3; transition: all .5s; }
+.lm-name { font-family: var(--mono); font-size: 9px; color: var(--muted); }
+.lm-km   { font-family: var(--mono); font-size: 8px; color: var(--border); margin-top: 1px; }
+.lm-item.unlocked .lm-icon { filter: none; opacity: 1; }
+.lm-item.unlocked .lm-name { color: var(--c0); }
+.lm-item.unlocked .lm-km   { color: var(--muted); }
+.lm-item.unlocked { background: rgba(232,255,71,.04); }
+
+/* ── PROGRESS ROW ── */
+.progress-row {
+  display: flex; gap: .8rem; margin-bottom: 1.5rem;
+}
+.prog-block {
+  flex: 1; border: 1px solid var(--border); padding: .8rem .9rem;
+}
+.prog-label { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 2px; margin-bottom: .4rem; }
+.prog-value { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; }
+.prog-sub   { font-family: var(--mono); font-size: 9px; color: var(--muted); margin-top: .2rem; }
+
+/* ── RANKING ── */
+.rank-section { margin-bottom: 1.5rem; }
+.rank-item {
+  display: grid; grid-template-columns: 2rem 1fr auto auto;
+  align-items: center; gap: .6rem;
+  padding: .9rem 1rem; border: 1px solid var(--border); border-bottom: none;
+  transition: background .2s;
+}
+.rank-item:last-child { border-bottom: 1px solid var(--border); }
+.rank-item:hover { background: rgba(255,255,255,.02); }
+.rank-num {
+  font-family: var(--mono); font-size: 1rem; font-weight: 700; color: var(--border);
+}
+.rank-num.top { color: var(--c0); }
+.rank-name { font-size: .85rem; font-weight: 500; }
+.rank-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: .4rem; }
+.rank-km { font-family: var(--mono); font-size: .75rem; color: var(--muted); }
+.rank-score { font-family: var(--mono); font-size: 1rem; font-weight: 700; }
+
+.score-bar-wrap { grid-column: 1/-1; height: 2px; background: var(--border); margin-top: .3rem; }
+.score-bar { height: 100%; transition: width .8s ease; }
+
+/* ── MISSION CARD ── */
+.mission-section { border: 1px solid var(--border); margin-bottom: 1.5rem; }
+.mission-header { padding: .7rem 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.mission-week { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+.mission-body { padding: .8rem 1rem; display: flex; flex-direction: column; gap: .6rem; }
+.mission-row { display: flex; align-items: center; gap: .6rem; }
+.m-check { width: 16px; height: 16px; border: 1px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+.m-check.done { border-color: var(--c0); color: var(--c0); background: rgba(232,255,71,.1); }
+.m-text { font-size: .8rem; color: var(--muted); }
+.m-text.done { color: var(--text); }
+
+/* ── MY TEAM ── */
+.my-team-section { border: 1px solid var(--border); margin-bottom: 1.5rem; display: none; }
+.contrib-bar-wrap { padding: .8rem 1rem; }
+.contrib-label { display: flex; justify-content: space-between; margin-bottom: .5rem; }
+.contrib-label span { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+.contrib-track { height: 4px; background: var(--border); margin-bottom: .8rem; }
+.contrib-fill { height: 100%; }
+.members-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; padding: 0 1rem .8rem; }
+.member-pill {
+  display: flex; align-items: center; gap: .5rem; padding: .5rem .7rem;
+  background: rgba(255,255,255,.02); border: 1px solid var(--border);
+}
+.member-avatar { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 9px; font-weight: 700; flex-shrink: 0; }
+.member-name { font-size: .75rem; }
+.member-km { font-family: var(--mono); font-size: .7rem; color: var(--muted); margin-left: auto; }
+
+/* ── FAB ── */
+.fab {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 100;
+  background: var(--c0); color: #000; font-family: var(--mono);
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  padding: .9rem 1.4rem; text-decoration: none;
+  border: none; cursor: pointer;
+  box-shadow: 0 0 30px rgba(232,255,71,.4);
+  transition: all .2s; display: flex; align-items: center; gap: .5rem;
+}
+.fab:hover { background: #fff; box-shadow: 0 0 40px rgba(255,255,255,.3); }
+.fab-dot { width: 6px; height: 6px; background: #000; border-radius: 50%; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ── REGISTER MODAL ── */
+.modal-wrap {
+  position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 200;
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+}
+.modal-wrap.hidden { display: none; }
+.modal {
+  background: var(--surface); border: 1px solid var(--border);
+  max-width: 400px; width: 100%; padding: 1.5rem;
+}
+.modal h2 { font-family: var(--mono); font-size: 1rem; margin-bottom: 1rem; }
+.form-group { margin-bottom: .8rem; }
+.form-group label { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; display: block; margin-bottom: .3rem; }
+.form-group input, .form-group select {
+  width: 100%; background: var(--bg); border: 1px solid var(--border);
+  color: var(--text); font-family: var(--sans); font-size: .85rem;
+  padding: .6rem .8rem; outline: none;
+}
+.form-group input:focus, .form-group select:focus { border-color: var(--c0); }
+.form-group select option { background: #111; }
+.team-choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.team-choice {
+  padding: .7rem; border: 1px solid var(--border); cursor: pointer;
+  text-align: center; transition: all .2s;
+}
+.team-choice.selected { border-color: var(--text); background: rgba(255,255,255,.05); }
+.team-choice .tc-name { font-size: .8rem; font-weight: 500; }
+.team-choice .tc-dot { width: 8px; height: 8px; border-radius: 50%; margin: 0 auto .4rem; }
+.form-btn {
+  width: 100%; background: var(--c0); color: #000; font-family: var(--mono);
+  font-size: 11px; font-weight: 700; letter-spacing: 2px; padding: .8rem;
+  border: none; cursor: pointer; margin-top: .5rem; transition: all .2s;
+}
+.form-btn:hover { background: #fff; }
+.modal-toggle { font-family: var(--mono); font-size: 10px; color: var(--muted); text-align: center; margin-top: .8rem; cursor: pointer; }
+.modal-toggle:hover { color: var(--text); }
+.form-error { font-family: var(--mono); font-size: 10px; color: var(--c2); margin-top: .5rem; min-height: 14px; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid">
+    <div>
+      <div class="campaign-tag">런푸마팸 5기 · 6주 챌린지</div>
+      <div class="hero-title">
+        <div class="glitch" data-text="RUN">RUN</div><br>
+        <div class="glitch" data-text="PUMA">PUMA</div><br>
+        <div class="glitch" data-text="FAM">FAM</div>
+      </div>
+    </div>
+    <div class="dday-badge">캠페인 목표<br><span id="
