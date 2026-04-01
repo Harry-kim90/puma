@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RUN PUMA FAM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════
+   GAME UI — RUN PUMA FAM
+   무드: 네온 스포츠 게임 대시보드 (핫핑크 + 시안 + 다크)
+═══════════════════════════════════════════════════════ */
+:root {
+  --bg:      #0d0d14;
+  --bg2:     #12121e;
+  --bg3:     #1a1a2e;
+  --card:    #16162a;
+  --border:  rgba(255,255,255,.08);
+  --border2: rgba(255,255,255,.15);
+  --text:    #f0f0f8;
+  --muted:   #6b6b8a;
+  --pink:    #ff2d78;
+  --cyan:    #00e5ff;
+  --yellow:  #ffe600;
+  --c0:      #E8FF47;
+  --c1:      #00e5ff;
+  --c2:      #ff2d78;
+  --c3:      #bf5aff;
+  --head:    'Barlow Condensed', sans-serif;
+  --sans:    'Noto Sans KR', sans-serif;
+
+  /* 팀 색상 */
+  --ha: #E8FF47;
+  --hb: #00e5ff;
+  --ca: #ff2d78;
+  --da: #bf5aff;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+  /* 배경 그리드 패턴 */
+  background-image:
+    linear-gradient(rgba(0,229,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--pink); }
+
+/* ══════════════════════════════════════
+   HERO
+══════════════════════════════════════ */
+.hero {
+  position: relative;
+  background-image: url('main-bg.jpg');
+  background-size: cover;
+  background-position: center top;
+  padding: 0;
+  overflow: hidden;
+  border-bottom: 2px solid var(--pink);
+}
+.hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(13,13,20,.35) 0%,
+    rgba(13,13,20,.72) 60%,
+    rgba(13,13,20,1)   100%
+  );
+  pointer-events: none;
+}
+/* 스캔라인 */
+.hero-scan {
+  position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px, transparent 3px,
+    rgba(0,0,0,.18) 3px, rgba(0,0,0,.18) 4px
+  );
+}
+.hero-inner {
+  position: relative; z-index: 2;
+  max-width: 960px; margin: 0 auto;
+  padding: 2.5rem 1.5rem 2rem;
+  display: flex; flex-direction: column; gap: .8rem;
+}
+.hero-top {
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.gen-tag {
+  font-family: var(--head);
+  font-size: 13px; letter-spacing: 4px; font-weight: 600;
+  color: var(--cyan); text-transform: uppercase;
+  display: flex; align-items: center; gap: .5rem;
+}
+.gen-tag::before {
+  content: ''; display: block; width: 18px; height: 2px; background: var(--cyan);
+}
+.hero-title-block { margin: .4rem 0; }
+.hero-main-title {
+  font-family: var(--head);
+  font-size: clamp(3.2rem, 10vw, 6.5rem);
+  font-weight: 900; line-height: .9;
+  letter-spacing: -2px;
+  color: #fff;
+  text-transform: uppercase;
+  display: block;
+}
+.hero-main-title.accent { color: var(--pink); }
+.hero-sub {
+  font-family: var(--head);
+  font-size: clamp(1rem, 3vw, 1.4rem);
+  font-weight: 600; letter-spacing: 6px;
+  color: var(--cyan); text-transform: uppercase;
+  margin-top: .3rem;
+}
+
+/* 유저 바 */
+.hero-bottom {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: .8rem; border-top: 1px solid rgba(255,255,255,.1);
+  flex-wrap: wrap; gap: .6rem;
+}
+.user-chip {
+  display: flex; align-items: center; gap: .5rem;
+  font-family: var(--head); font-size: 14px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  padding: .4rem .9rem;
+  border: 1px solid; border-radius: 2px;
+  background: rgba(0,0,0,.5);
+}
+.user-chip .chip-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--pink);
+  animation: blink-dot 1.4s infinite;
+}
+@keyframes blink-dot { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+.nav-links { display: flex; gap: .4rem; }
+.nav-links a {
+  font-family: var(--head); font-size: 12px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--muted); text-decoration: none;
+  padding: .35rem .7rem;
+  border: 1px solid rgba(255,255,255,.12);
+  transition: all .2s;
+}
+.nav-links a:hover { color: var(--cyan); border-color: var(--cyan); }
+
+/* ══════════════════════════════════════
+   LAYOUT
+══════════════════════════════════════ */
+.main {
+  max-width: 960px; margin: 0 auto;
+  padding: 1.8rem 1rem 7rem;
+  display: flex; flex-direction: column; gap: 1.5rem;
+}
+
+/* ── SECTION HEADER ── */
+.sec-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .55rem 1rem;
+  background: var(--bg3);
+  border-left: 3px solid var(--pink);
+  margin-bottom: .8rem;
+}
+.sec-head-title {
+  font-family: var(--head); font-size: 13px; font-weight: 800;
+  letter-spacing: 3px; text-transform: uppercase; color: var(--text);
+}
+.sec-head-sub {
+  font-family: var(--head); font-size: 11px; letter-spacing: 1px;
+  color: var(--muted);
+}
+
+/* ══════════════════════════════════════
+   TEAM UNLOCK (트랙 + 메달)
+══════════════════════════════════════ */
+.team-unlock-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--cyan);
+  position: relative; overflow: hidden;
+  max-width: 500px; margin: 0 auto;
+  width: 100%;
+}
+.tu-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .6rem 1rem;
+  background: rgba(0,229,255,.05);
+  border-bottom: 1px solid rgba(0,229,255,.15);
+}
+.tu-title {
+  font-family: var(--head); font-size: 12px; font-weight: 800;
+  letter-spacing: 3px; text-transform: uppercase; color: var(--cyan);
+}
+.medal-canvas {
+  position: relative; width: 100%; height: 400px;
+  background: radial-gradient(ellipse at center, #1a1a2e 0%, #0d0d14 100%);
+  overflow: hidden;
+}
+/* 배경 도트 그리드 */
+.medal-canvas::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(0,229,255,.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+  z-index: 0;
+}
+
+.track-bg {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 88%; height: 83%;
+  background: #8b1a1a;
+  border-radius: 500px;
+  border: 1px solid rgba(255,255,255,.25);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1;
+  box-shadow:
+    inset 0 0 0 8px #8b1a1a,
+    inset 0 0 0 9px rgba(255,255,255,.25),
+    inset 0 0 0 17px #8b1a1a,
+    inset 0 0 0 18px rgba(255,255,255,.25),
+    inset 0 0 0 26px #8b1a1a,
+    inset 0 0 0 27px rgba(255,255,255,.15),
+    0 0 40px rgba(255,45,120,.15);
+}
+.track-field {
+  width: calc(100% - 54px); height: calc(100% - 54px);
+  background: #0d3d1f;
+  border-radius: 500px;
+  border: 1px solid rgba(255,255,255,.2);
+  box-shadow: 0 0 30px rgba(0,229,255,.08);
+}
+.medal-img {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 46%; height: 46%;
+  object-fit: contain; z-index: 2;
+  filter: drop-shadow(0 0 20px rgba(255,45,120,.5)) drop-shadow(0 8px 20px rgba(0,0,0,.9));
+}
+
+/* 러너 아이콘 */
+.team-runner {
+  position: absolute; font-size: 18px; z-index: 4;
+  filter: drop-shadow(0 0 6px currentColor);
+  pointer-events: none;
+  transition: top 1s cubic-bezier(.4,0,.2,1), bottom 1s cubic-bezier(.4,0,.2,1),
+              left 1s cubic-bezier(.4,0,.2,1), right 1s cubic-bezier(.4,0,.2,1);
+}
+.runner-ha { color: var(--ha); top: 10%; left: 10%; }
+.runner-hb { color: var(--hb); top: 10%; right: 10%; }
+.runner-ca { color: var(--ca); bottom: 10%; left: 10%; }
+.runner-da { color: var(--da); bottom: 10%; right: 10%; }
+
+/* 팀 레이블 */
+.team-label {
+  position: absolute; font-family: var(--head);
+  font-size: 9px; font-weight: 800; letter-spacing: 1px;
+  padding: .25rem .5rem;
+  border: 1px solid rgba(255,255,255,.2);
+  background: rgba(0,0,0,.75);
+  text-transform: uppercase;
+  pointer-events: none; z-index: 5;
+  line-height: 1.4;
+}
+.ha-label { left: 6px; top: 6px; color: var(--ha); border-color: var(--ha); }
+.hb-label { right: 6px; top: 6px; color: var(--hb); border-color: var(--hb); }
+.ca-label { left: 6px; bottom: 6px; color: var(--ca); border-color: var(--ca); }
+.da-label { right: 6px; bottom: 6px; color: var(--da); border-color: var(--da); }
+
+/* ══════════════════════════════════════
+   STATS CARDS
+══════════════════════════════════════ */
+.dashboard-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: .8rem;
+}
+.prog-block {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 1rem 1.1rem;
+  position: relative; overflow: hidden;
+  transition: border-color .2s;
+}
+.prog-block:hover { border-color: var(--border2); }
+.prog-block::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.prog-block:nth-child(1)::before { background: var(--cyan); }
+.prog-block:nth-child(2)::before { background: var(--pink); }
+.prog-block:nth-child(3)::before { background: var(--c3); }
+.prog-label {
+  font-family: var(--head); font-size: 9px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase; color: var(--muted);
+  margin-bottom: .5rem; display: block;
+}
+.prog-value {
+  font-family: var(--head); font-size: 1.9rem; font-weight: 900;
+  line-height: 1; letter-spacing: -1px;
+}
+.prog-sub {
+  font-family: var(--head); font-size: 9px; color: var(--muted);
+  margin-top: .3rem; letter-spacing: 1px;
+}
+
+/* ══════════════════════════════════════
+   RANKING CARDS
+══════════════════════════════════════ */
+.ranking-container {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+@media (max-width: 680px) { .ranking-container { grid-template-columns: 1fr; } }
+
+.rank-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.rank-card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .6rem 1rem;
+  background: rgba(255,255,255,.03);
+  border-bottom: 1px solid var(--border);
+}
+.rank-card-title {
+  font-family: var(--head); font-size: 11px; font-weight: 800;
+  letter-spacing: 3px; text-transform: uppercase; color: var(--text);
+}
+.rank-card-badge {
+  font-family: var(--head); font-size: 9px; font-weight: 700;
+  padding: .15rem .5rem; letter-spacing: 1px;
+}
+
+.rank-list { padding: 0; }
+.rank-item {
+  display: block;
+  padding: .75rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  transition: background .15s;
+}
+.rank-item:last-child { border-bottom: none; }
+.rank-item:hover { background: rgba(255,255,255,.025); }
+.rank-item-row {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: .35rem;
+}
+.rank-left { display: flex; align-items: center; gap: .6rem; }
+.rank-pos {
+  font-family: var(--head); font-size: 1.1rem; font-weight: 900;
+  color: var(--muted); min-width: 1.4rem; letter-spacing: -1px;
+}
+.rank-pos.top { color: var(--yellow); }
+/* 1위는 특별 처리 */
+.rank-item:first-child .rank-pos {
+  color: var(--yellow);
+  text-shadow: 0 0 10px var(--yellow);
+}
+.rank-dot { width: 8px; height: 8px; border-radius: 50%; }
+.rank-name {
+  font-family: var(--sans); font-size: .85rem; font-weight: 600;
+}
+.rank-team-tag {
+  font-family: var(--head); font-size: 8px; font-weight: 700;
+  padding: 1px 5px; border: 1px solid; letter-spacing: 1px;
+}
+.rank-val-box { text-align: right; }
+.rank-km {
+  font-family: var(--head); font-size: 1.1rem; font-weight: 800;
+  letter-spacing: -1px;
+}
+.rank-score { font-family: var(--head); font-size: 9px; color: var(--muted); letter-spacing: 1px; }
+.score-bar-wrap {
+  height: 2px; background: rgba(255,255,255,.07);
+}
+.score-bar { height: 100%; transition: width .8s ease; }
+
+/* ══════════════════════════════════════
+   MISSION
+══════════════════════════════════════ */
+.mission-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--pink);
+  overflow: hidden;
+}
+.mission-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .65rem 1rem;
+  background: rgba(255,45,120,.06);
+  border-bottom: 1px solid rgba(255,45,120,.2);
+}
+.mission-title {
+  font-family: var(--head); font-size: 12px; font-weight: 800;
+  letter-spacing: 3px; text-transform: uppercase; color: var(--pink);
+}
+.mission-week {
+  font-family: var(--head); font-size: 11px; font-weight: 700;
+  color: var(--c0); letter-spacing: 2px;
+}
+.mission-body {
+  padding: 1rem;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: .6rem;
+}
+@media (max-width: 580px) { .mission-body { grid-template-columns: 1fr; } }
+
+.mission-row {
+  display: flex; align-items: flex-start; gap: .7rem;
+  background: rgba(255,255,255,.025);
+  border: 1px solid rgba(255,255,255,.06);
+  padding: .75rem;
+  transition: border-color .2s, background .2s;
+}
+.mission-row:hover { background: rgba(255,255,255,.04); }
+.m-check {
+  width: 22px; height: 22px; flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,.2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--head); font-size: 13px; font-weight: 900;
+  color: transparent; transition: all .3s;
+}
+.m-check.done {
+  border-color: var(--cyan); color: var(--cyan);
+  background: rgba(0,229,255,.1);
+  box-shadow: 0 0 8px rgba(0,229,255,.3);
+}
+.m-inner { display: flex; flex-direction: column; gap: 2px; }
+.m-week-badge {
+  font-family: var(--head); font-size: 9px; font-weight: 700;
+  letter-spacing: 2px; color: var(--pink);
+}
+.m-text {
+  font-size: .82rem; color: var(--muted); line-height: 1.3; transition: color .3s;
+}
+.m-text.done { color: var(--text); font-weight: 500; }
+
+/* ══════════════════════════════════════
+   MY TEAM
+══════════════════════════════════════ */
+.my-team-section {
+  display: none;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--c3);
+  overflow: hidden;
+}
+.my-team-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .65rem 1rem;
+  background: rgba(191,90,255,.06);
+  border-bottom: 1px solid rgba(191,90,255,.2);
+}
+.my-team-title {
+  font-family: var(--head); font-size: 12px; font-weight: 800;
+  letter-spacing: 3px; text-transform: uppercase; color: var(--c3);
+}
+.contrib-bar-wrap { padding: .9rem 1rem; }
+.contrib-label {
+  display: flex; justify-content: space-between; margin-bottom: .4rem;
+}
+.contrib-label span {
+  font-family: var(--head); font-size: 10px; font-weight: 700;
+  letter-spacing: 2px; color: var(--muted);
+}
+.contrib-track {
+  height: 5px; background: rgba(255,255,255,.08);
+  margin-bottom: .6rem;
+}
+.contrib-fill { height: 100%; transition: width 1s ease; }
+
+.members-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: .4rem; padding: 0 1rem 1rem;
+}
+.member-pill {
+  display: flex; align-items: center; gap: .6rem;
+  padding: .55rem .8rem;
+  background: rgba(255,255,255,.025);
+  border: 1px solid rgba(255,255,255,.07);
+  transition: border-color .2s;
+}
+.member-pill:hover { border-color: rgba(255,255,255,.15); }
+.member-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--head); font-size: 11px; font-weight: 900; flex-shrink: 0;
+}
+.member-name { font-size: .8rem; font-weight: 500; }
+.member-km {
+  font-family: var(--head); font-size: .78rem; font-weight: 700;
+  color: var(--muted); margin-left: auto;
+}
+
+/* ══════════════════════════════════════
+   FAB
+══════════════════════════════════════ */
+.fab {
+  position: fixed; bottom: 1.8rem; right: 1.5rem; z-index: 100;
+  background: var(--pink);
+  color: #fff;
+  font-family: var(--head); font-size: 13px; font-weight: 900;
+  letter-spacing: 3px; text-transform: uppercase;
+  padding: .85rem 1.6rem;
+  text-decoration: none; border: none; cursor: pointer;
+  display: flex; align-items: center; gap: .5rem;
+  box-shadow: 0 0 30px rgba(255,45,120,.5), 0 4px 20px rgba(0,0,0,.5);
+  transition: all .2s;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}
+.fab:hover {
+  background: #fff; color: var(--pink);
+  box-shadow: 0 0 50px rgba(255,45,120,.7), 0 4px 30px rgba(0,0,0,.5);
+}
+.fab-dot {
+  width: 7px; height: 7px; background: currentColor;
+  border-radius: 50%; animation: pulse 1.5s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+/* ══════════════════════════════════════
+   MODAL
+══════════════════════════════════════ */
+.modal-wrap {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.88);
+  z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+  backdrop-filter: blur(4px);
+}
+.modal-wrap.hidden { display: none; }
+.modal {
+  background: var(--bg3);
+  border: 1px solid rgba(0,229,255,.25);
+  border-top: 3px solid var(--cyan);
+  max-width: 420px; width: 100%;
+  padding: 1.8rem;
+  box-shadow: 0 0 60px rgba(0,229,255,.15);
+  position: relative;
+}
+.modal::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+}
+.modal h2 {
+  font-family: var(--head); font-size: 1.4rem; font-weight: 900;
+  letter-spacing: 4px; text-transform: uppercase;
+  color: var(--cyan); margin-bottom: 1.4rem;
+}
+.form-group { margin-bottom: 1rem; }
+.form-group label {
+  font-family: var(--head); font-size: 9px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--muted); display: block; margin-bottom: .4rem;
+}
+.form-group input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid rgba(255,255,255,.12);
+  border-bottom: 2px solid rgba(0,229,255,.3);
+  color: var(--text);
+  font-family: var(--sans); font-size: .9rem;
+  padding: .65rem .9rem;
+  outline: none;
+  transition: border-color .2s;
+}
+.form-group input:focus {
+  border-color: rgba(0,229,255,.6);
+  border-bottom-color: var(--cyan);
+  background: rgba(0,229,255,.04);
+}
+
+/* 팀 선택 */
+.team-choice-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .5rem;
+}
+.team-choice {
+  padding: .7rem .8rem;
+  border: 1px solid rgba(255,255,255,.1);
+  cursor: pointer; text-align: center;
+  transition: all .2s;
+  background: rgba(255,255,255,.02);
+}
+.team-choice:hover { background: rgba(255,255,255,.05); }
+.team-choice.selected {
+  border-color: var(--cyan);
+  background: rgba(0,229,255,.08);
+  box-shadow: 0 0 12px rgba(0,229,255,.2);
+}
+.tc-name {
+  font-family: var(--head); font-size: 12px; font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.form-btn {
+  width: 100%;
+  background: var(--pink);
+  color: #fff;
+  font-family: var(--head); font-size: 12px; font-weight: 900;
+  letter-spacing: 4px; text-transform: uppercase;
+  padding: .85rem;
+  border: none; cursor: pointer;
+  margin-top: 1rem;
+  transition: all .2s;
+  box-shadow: 0 0 20px rgba(255,45,120,.3);
+}
+.form-btn:hover { background: #fff; color: var(--pink); }
+
+.modal-toggle {
+  font-family: var(--head); font-size: 10px; font-weight: 700;
+  letter-spacing: 2px; color: var(--muted);
+  text-align: center; margin-top: 1rem; cursor: pointer;
+  text-transform: uppercase;
+  transition: color .2s;
+}
+.modal-toggle:hover { color: var(--cyan); }
+
+.form-error {
+  font-family: var(--head); font-size: 10px; font-weight: 700;
+  letter-spacing: 1px; color: var(--pink);
+  margin-top: .5rem; min-height: 14px;
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 580px) {
+  .dashboard-grid { grid-template-columns: 1fr 1fr; }
+  .dashboard-grid .prog-block:last-child { grid-column: 1 / -1; }
+  .members-grid { grid-template-columns: 1fr; }
+  .hero-main-title { letter-spacing: -1px; }
+}
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-overlay"></div>
+  <div class="hero-scan"></div>
+  <div class="hero-inner">
+    <div class="hero-top">
+      <div>
+        <div class="gen-tag">5TH GENERATION MISSION</div>
+        <div class="hero-title-block">
+          <span class="hero-main-title">RUN PUMA</span>
+          <span class="hero-main-title accent">FAM</span>
+          <div class="hero-sub">6-WEEK RUNNING CHALLENGE</div>
+        </div>
+      </div>
+      <div style="font-family:var(--head);font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.4);text-align:right;line-height:1.6;border:1px solid rgba(255,255,255,.12);padding:.5rem .8rem;background:rgba(0,0,0,.5)">
+        CAMPAIGN GOAL<br><span style="color:var(--cyan);font-size:1.1rem;">팀별 목표</span>
+      </div>
+    </div>
+    <div class="hero-bottom">
+      <div class="user-chip" id="userChip" style="border-color:rgba(255,255,255,.15);color:var(--muted)">
+        <div class="chip-dot" style="background:var(--muted)"></div>
+        로그인 필요
+      </div>
+      <nav class="nav-links">
+        <a href="javascript:void(0)" onclick="APP.setCurrentUserId(null);location.reload()">LOGOUT</a>
+        <a href="history.html">MY LOG</a>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+  <!-- TEAM PROGRESS UNLOCK -->
+  <div class="team-unlock-section">
+    <div class="tu-header">
+      <span class="tu-title">⚡ TEAM PROGRESS UNLOCK</span>
+      <span style="font-family:var(--head);font-size:10px;font-weight:700;color:var(--muted);letter-spacing:2px">SEASON TRACK</span>
+    </div>
+    <div class="medal-canvas" id="seoulCanvas">
+      <div class="track-bg"><div class="track-field"></div></div>
+      <img src="medal.png" alt="Seoul Race Medal" class="medal-img" onerror="this.style.display='none'">
+
+      <div class="team-runner runner-ha" id="haRunner">🏃</div>
+      <div class="team-runner runner-hb" id="hbRunner">🏃</div>
+      <div class="team-runner runner-ca" id="caRunner">🏃</div>
+      <div class="team-runner runner-da" id="daRunner">🏃</div>
+
+      <div class="team-label ha-label">HALF A<br><span id="haPct">0%</span></div>
+      <div class="team-label hb-label">HALF B<br><span id="hbPct">0%</span></div>
+      <div class="team-label ca-label">10KM C<br><span id="caPct">0%</span></div>
+      <div class="team-label da-label">10KM D<br><span id="daPct">0%</span></div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="dashboard-grid" id="progressRow"></div>
+
+  <!-- RANKING -->
+  <div class="ranking-container">
+    <div class="rank-card">
+      <div class="rank-card-head">
+        <span class="rank-card-title">🏆 TEAM RANKING</span>
+        <span class="rank-card-badge" style="color:var(--muted)">종합 점수 기준</span>
+      </div>
+      <div class="rank-list" id="rankSection"></div>
+    </div>
+    <div class="rank-card">
+      <div class="rank-card-head">
+        <span class="rank-card-title">⚡ TOP RUNNERS</span>
+        <span class="rank-card-badge" style="color:var(--c0)">개인 누적 거리</span>
+      </div>
+      <div class="rank-list" id="individualRankSection"></div>
+    </div>
+  </div>
+
+  <!-- MISSION -->
+  <div class="mission-section">
+    <div class="mission-header">
+      <span class="mission-title">🎯 WEEKLY MISSIONS</span>
+      <span class="mission-week" id="weekLabel">6 WEEKS</span>
+    </div>
+    <div class="mission-body" id="missionBody"></div>
+  </div>
+
+  <!-- MY TEAM -->
+  <div class="my-team-section" id="myTeamSection">
+    <div class="my-team-head">
+      <span class="my-team-title">👥 MY TEAM</span>
+      <span id="myTeamName" style="font-family:var(--head);font-size:11px;font-weight:800;letter-spacing:2px"></span>
+    </div>
+    <div class="contrib-bar-wrap" id="contribBar"></div>
+    <div class="members-grid" id="membersGrid"></div>
+  </div>
+
+</div>
+
+<!-- FAB -->
+<a class="fab" href="submit.html">
+  <div class="fab-dot"></div>
+  기록 제출
+</a>
+
+<!-- MODAL -->
+<div class="modal-wrap hidden" id="modalWrap">
+  <div class="modal">
+    <h2 id="modalTitle">REGISTER</h2>
+    <div id="registerForm">
+      <div class="form-group"><label>이름</label><input type="text" id="regName" placeholder="홍길동"></div>
+      <div class="form-group"><label>연락처 뒤 4자리</label><input type="text" id="regPhone" maxlength="4" placeholder="1234"></div>
+      <div class="form-group"><label>팀 선택</label><div class="team-choice-grid" id="teamChoiceGrid"></div></div>
+      <div class="form-error" id="regError"></div>
+      <button class="form-btn" onclick="doRegister()">참가 등록 →</button>
+      <div class="modal-toggle" onclick="toggleModal()">이미 등록했어요 → 로그인</div>
+    </div>
+    <div id="loginForm" style="display:none">
+      <div class="form-group"><label>이름</label><input type="text" id="logName" placeholder="홍길동"></div>
+      <div class="form-group"><label>연락처 뒤 4자리</label><input type="text" id="logPhone" maxlength="4" placeholder="1234"></div>
+      <div class="form-error" id="logError"></div>
+      <button class="form-btn" onclick="doLogin()">확인 →</button>
+      <div class="modal-toggle" onclick="toggleModal()">← 신규 등록</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════
+   APP LOGIC — Firebase 연동 (원본 그대로 유지)
+══════════════════════════════════════════════════ */
+const firebaseConfig = {
+  apiKey: "AIzaSyBMNqF6Uc7YncfP8beK2eJwIadksBgTVqU",
+  authDomain: "run-puma-fam.firebaseapp.com",
+  projectId: "run-puma-fam",
+  storageBucket: "run-puma-fam.firebasestorage.app",
+  messagingSenderId: "865249069550",
+  appId: "1:865249069550:web:c3328b841a55eb6675a6ff"
+};
+
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const APP = {
+  GOAL_KM: 2026, MAX_DAILY_KM: 50,
+  TEAMS: [
+    { id: 0, name: "HALF A팀", color: "#E8FF47", bg: "#1a1a0d", abbr: "HA" },
+    { id: 1, name: "HALF B팀", color: "#00e5ff", bg: "#0d1a17", abbr: "HB" },
+    { id: 2, name: "10KM C팀", color: "#ff2d78", bg: "#1a0f0d", abbr: "CA" },
+    { id: 3, name: "10KM D팀", color: "#bf5aff", bg: "#150d1a", abbr: "DA" },
+  ],
+  TEAM_GOALS: [600, 600, 413, 413],
+  WEEKLY_MISSIONS: [
+    { week: 1, desc: "조깅 10km" }, { week: 2, desc: "80분 조깅" }, { week: 3, desc: "지속주 10km" },
+    { week: 4, desc: "100분 조깅" }, { week: 5, desc: "거리주 15km" }, { week: 6, desc: "5km 기록회" }
+  ],
+  state: { users: [], records: [], missions: {}, seeded: false },
+
+  init() {
+    db.ref().on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        this.state.users   = data.users   || [];
+        this.state.records = data.records || [];
+        this.state.missions = data.missions || {};
+        this.state.seeded  = data.seeded  || false;
+      }
+      renderAll();
+    });
+  },
+
+  getUsers()   { return this.state.users   || []; },
+  getRecords() { return this.state.records || []; },
+  getMissions() { return this.state.missions || {}; },
+
+  getCurrentUserId() { return localStorage.getItem("rtcs_currentUser"); },
+  setCurrentUserId(id) {
+    if (id === null) localStorage.removeItem("rtcs_currentUser");
+    else localStorage.setItem("rtcs_currentUser", id);
+  },
+  getCurrentUser() { const id = this.getCurrentUserId(); return this.getUsers().find(u => u.id === id) || null; },
+  getApprovedRecords() { return this.getRecords().filter(r => r.status === "approved"); },
+
+  getTeamStats() {
+    const users = this.getUsers(); const approved = this.getApprovedRecords();
+    return this.TEAMS.map(team => {
+      const members = users.filter(u => u.teamId === team.id);
+      const memberIds = members.map(u => u.id);
+      const records = approved.filter(r => memberIds.includes(r.userId));
+      const totalKm = records.reduce((s, r) => s + r.km, 0);
+      const participantCount = new Set(records.map(r => r.userId)).size;
+      return { ...team, totalKm: Math.round(totalKm*10)/10, memberCount: members.length, participantCount, recordCount: records.length };
+    });
+  },
+
+  getTeamScores() {
+    const stats = this.getTeamStats();
+    const totalKm = stats.reduce((s, t) => s + t.totalKm, 0) || 1;
+    return stats.map(t => {
+      const distScore  = Math.round((t.totalKm / totalKm) * 50 * 10) / 10;
+      const partRate   = t.memberCount > 0 ? t.participantCount / t.memberCount : 0;
+      const partScore  = Math.round(partRate * 20 * 10) / 10;
+      const missionScore = t.totalKm >= 50 ? 20 : Math.round((t.totalKm / 50) * 20 * 10) / 10;
+      const bonusScore = (t.memberCount > 0 && t.participantCount >= t.memberCount) ? 10 : 0;
+      const total = Math.round((distScore + partScore + missionScore + bonusScore) * 10) / 10;
+      return { ...t, distScore, partScore, missionScore, bonusScore, total };
+    }).sort((a, b) => b.total - a.total);
+  },
+
+  getTotalKm() { return Math.round(this.getApprovedRecords().reduce((s, r) => s + r.km, 0) * 10) / 10; },
+
+  registerUser(name, phone, teamId) {
+    const users = this.getUsers();
+    if (users.find(u => u.name === name && u.phone === phone.slice(-4))) return { ok: false, msg: "이미 등록된 참가자입니다." };
+    const id = "u" + Date.now();
+    const user = { id, name, phone: phone.slice(-4), teamId: parseInt(teamId), joinDate: new Date().toISOString().slice(0,10) };
+    users.push(user);
+    db.ref('users').set(users);
+    this.setCurrentUserId(id);
+    return { ok: true, user };
+  },
+
+  loginUser(name, phone) {
+    const users = this.getUsers();
+    const user = users.find(u => u.name === name && u.phone === phone.slice(-4));
+    if (!user) return { ok: false, msg: "이름 또는 연락처가 일치하지 않아요." };
+    this.setCurrentUserId(user.id);
+    return { ok: true, user };
+  }
+};
+
+/* ══════════════════════════════════════════════════
+   UI 함수
+══════════════════════════════════════════════════ */
+let selectedTeamId = null;
+let isLoginMode = false;
+
+function toggleModal() {
+  isLoginMode = !isLoginMode;
+  document.getElementById('modalTitle').textContent = isLoginMode ? 'LOGIN' : 'REGISTER';
+  document.getElementById('registerForm').style.display = isLoginMode ? 'none' : 'block';
+  document.getElementById('loginForm').style.display   = isLoginMode ? 'block' : 'none';
+}
+
+function doRegister() {
+  const name  = document.getElementById('regName').value.trim();
+  const phone = document.getElementById('regPhone').value.trim();
+  if (!name || !phone || phone.length < 4) { document.getElementById('regError').textContent = '이름과 연락처 4자리를 입력해주세요.'; return; }
+  if (selectedTeamId === null) { document.getElementById('regError').textContent = '팀을 선택해주세요.'; return; }
+  const r = APP.registerUser(name, phone, selectedTeamId);
+  if (!r.ok) { document.getElementById('regError').textContent = r.msg; return; }
+  document.getElementById('modalWrap').classList.add('hidden');
+}
+
+function doLogin() {
+  const name  = document.getElementById('logName').value.trim();
+  const phone = document.getElementById('logPhone').value.trim();
+  const r = APP.loginUser(name, phone);
+  if (!r.ok) { document.getElementById('logError').textContent = r.msg; return; }
+  document.getElementById('modalWrap').classList.add('hidden');
+  renderAll();
+}
+
+function buildTeamChoices() {
+  const grid = document.getElementById('teamChoiceGrid');
+  if (!grid) return;
+  grid.innerHTML = APP.TEAMS.map(t =>
+    `<div class="team-choice" onclick="selectTeam(${t.id})" id="tc${t.id}">
+      <div class="tc-name" style="color:${t.color}">${t.name}</div>
+    </div>`
+  ).join('');
+}
+
+function selectTeam(id) {
+  selectedTeamId = id;
+  APP.TEAMS.forEach(t => { const el = document.getElementById('tc'+t.id); if(el) el.classList.remove('selected'); });
+  const target = document.getElementById('tc'+id);
+  if (target) target.classList.add('selected');
+}
+
+function renderAll() {
+  const modal = document.getElementById('modalWrap');
+  const user  = APP.getCurrentUser();
+
+  renderTeamUnlock();
+  renderProgress();
+  renderRanking();
+  renderIndividualRanking();
+  renderMission();
+
+  if (!user) {
+    modal.classList.remove('hidden');
+    buildTeamChoices();
+    document.getElementById('myTeamSection').style.display = 'none';
+    return;
+  }
+
+  modal.classList.add('hidden');
+  document.getElementById('myTeamSection').style.display = 'block';
+
+  const team = APP.TEAMS[user.teamId];
+  const chip = document.getElementById('userChip');
+  chip.innerHTML = `<div class="chip-dot" style="background:${team.color}"></div>${user.name} · ${team.name}`;
+  chip.style.borderColor = team.color;
+  chip.style.color = team.color;
+
+  renderMyTeam(user);
+}
+
+function renderTeamUnlock() {
+  const stats = APP.getTeamStats();
+  stats.forEach((t, i) => {
+    const goal = APP.TEAM_GOALS[i];
+    const pct  = Math.min(100, (t.totalKm / goal) * 100);
+    const abbr = t.abbr.toLowerCase();
+    const runnerEl = document.getElementById(abbr + 'Runner');
+    const pctEl    = document.getElementById(abbr + 'Pct');
+    if (runnerEl) {
+      const mv = (10 + (pct * (42-10) / 100)) + '%';
+      if (t.abbr === 'HA') { runnerEl.style.top = mv; runnerEl.style.left = mv; }
+      else if (t.abbr === 'HB') { runnerEl.style.top = mv; runnerEl.style.right = mv; }
+      else if (t.abbr === 'CA') { runnerEl.style.bottom = mv; runnerEl.style.left = mv; }
+      else if (t.abbr === 'DA') { runnerEl.style.bottom = mv; runnerEl.style.right = mv; }
+    }
+    if (pctEl) pctEl.textContent = pct.toFixed(1) + '%';
+  });
+}
+
+function renderProgress() {
+  const user = APP.getCurrentUser();
+  let displayKm = 0; let label = "TOTAL DISTANCE"; let color = "var(--cyan)"; let pct = "0.0";
+
+  if (user) {
+    const teamStats = APP.getTeamStats().find(t => t.id === user.teamId);
+    const teamGoal  = APP.TEAM_GOALS[user.teamId];
+    displayKm = teamStats ? teamStats.totalKm : 0;
+    label = "MY TEAM KM";
+    color = APP.TEAMS[user.teamId].color;
+    pct = Math.min(100, (displayKm / teamGoal) * 100).toFixed(1);
+  } else {
+    displayKm = APP.getTotalKm();
+    pct = Math.min(100, (displayKm / 2026) * 100).toFixed(1);
+  }
+
+  document.getElementById('progressRow').innerHTML = `
+    <div class="prog-block">
+      <span class="prog-label">⚡ ${label}</span>
+      <div class="prog-value" style="color:${color}">${displayKm.toFixed(1)}<span style="font-size:11px;color:var(--muted);font-weight:400"> km</span></div>
+      <div class="prog-sub">/ ${user ? APP.TEAM_GOALS[user.teamId].toLocaleString() : '2,026'} km goal</div>
+    </div>
+    <div class="prog-block">
+      <span class="prog-label">🎯 GOAL UNLOCK</span>
+      <div class="prog-value" style="color:${color}">${pct}%</div>
+      <div class="prog-sub">목표 달성률</div>
+    </div>
+    <div class="prog-block">
+      <span class="prog-label">👥 RUNNERS</span>
+      <div class="prog-value" style="color:var(--c3)">${APP.getUsers().length}</div>
+      <div class="prog-sub">전체 참가 인원</div>
+    </div>`;
+}
+
+function renderRanking() {
+  const scores = APP.getTeamScores();
+  const maxScore = scores[0]?.total || 1;
+  document.getElementById('rankSection').innerHTML = scores.map((t, i) => `
+    <div class="rank-item">
+      <div class="rank-item-row">
+        <div class="rank-left">
+          <div class="rank-pos ${i < 3 ? 'top' : ''}">${i+1}</div>
+          <span class="rank-dot" style="background:${t.color}"></span>
+          <span class="rank-name">${t.name}</span>
+        </div>
+        <div class="rank-val-box">
+          <div class="rank-km" style="color:${t.color}">${t.totalKm.toFixed(1)}<span style="font-size:9px;color:var(--muted);font-weight:400"> km</span></div>
+          <div class="rank-score">SCORE: ${t.total.toFixed(1)}</div>
+        </div>
+      </div>
+      <div class="score-bar-wrap">
+        <div class="score-bar" style="width:${(t.total/maxScore*100).toFixed(1)}%;background:${t.color}"></div>
+      </div>
+    </div>`).join('');
+}
+
+function renderIndividualRanking() {
+  const users = APP.getUsers();
+  const approved = APP.getApprovedRecords();
+  const userKms = users.map(u => ({
+    ...u, km: approved.filter(r => r.userId === u.id).reduce((s,r) => s+r.km, 0)
+  })).sort((a,b) => b.km - a.km).slice(0, 10);
+
+  const container = document.getElementById('individualRankSection');
+  if (!userKms.length || userKms[0].km === 0) {
+    container.innerHTML = '<div style="padding:2rem 1rem;text-align:center;font-family:var(--head);font-size:10px;color:var(--muted);letter-spacing:2px">아직 기록이 없습니다</div>';
+    return;
+  }
+  container.innerHTML = userKms.map((u, i) => {
+    const team = APP.TEAMS[u.teamId] || APP.TEAMS[0];
+    return `<div class="rank-item">
+      <div class="rank-item-row">
+        <div class="rank-left">
+          <div class="rank-pos ${i < 3 ? 'top' : ''}">${i+1}</div>
+          <span class="rank-name">${u.name}</span>
+          <span class="rank-team-tag" style="color:${team.color};border-color:${team.color}">${team.abbr}</span>
+        </div>
+        <div class="rank-val-box">
+          <div class="rank-km" style="color:var(--text)">${u.km.toFixed(1)}<span style="font-size:9px;color:var(--muted);font-weight:400"> km</span></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderMission() {
+  const user = APP.getCurrentUser();
+  const userMissions = user ? (APP.getMissions()[user.id] || []) : [];
+  const weeklyStatus = APP.WEEKLY_MISSIONS.map((mission, idx) => ({
+    ...mission, done: userMissions.includes(idx + 1), week: idx + 1
+  }));
+  document.getElementById('missionBody').innerHTML = weeklyStatus.map(m => `
+    <div class="mission-row">
+      <div class="m-check ${m.done ? 'done' : ''}">✓</div>
+      <div class="m-inner">
+        <span class="m-week-badge">WEEK ${m.week}</span>
+        <div class="m-text ${m.done ? 'done' : ''}">${m.desc}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderMyTeam(user) {
+  const team      = APP.TEAMS[user.teamId];
+  const stats     = APP.getTeamStats().find(t => t.id === user.teamId);
+  const teamGoal  = APP.TEAM_GOALS[user.teamId];
+  const allUsers  = APP.getUsers().filter(u => u.teamId === user.teamId);
+  const approved  = APP.getApprovedRecords();
+
+  document.getElementById('myTeamName').textContent = team.name;
+  document.getElementById('myTeamName').style.color = team.color;
+
+  const totalTeamKm = stats?.totalKm || 0;
+  const contribPct  = Math.min(100, (totalTeamKm / teamGoal) * 100).toFixed(1);
+  document.getElementById('contribBar').innerHTML = `
+    <div class="contrib-label">
+      <span>팀 기여 거리</span>
+      <span style="color:${team.color}">${totalTeamKm.toFixed(1)} km / ${teamGoal.toLocaleString()} km</span>
+    </div>
+    <div class="contrib-track">
+      <div class="contrib-fill" style="width:${contribPct}%;background:${team.color}"></div>
+    </div>`;
+
+  document.getElementById('membersGrid').innerHTML = allUsers.map(u => {
+    const km = approved.filter(r => r.userId === u.id).reduce((s,r) => s+r.km, 0);
+    return `<div class="member-pill">
+      <div class="member-avatar" style="background:${team.color}22;color:${team.color}">${u.name.slice(0,1)}</div>
+      <div class="member-name">${u.name}</div>
+      <div class="member-km">${km.toFixed(1)} km</div>
+    </div>`;
+  }).join('');
+}
+
+APP.init();
+</script>
+</body>
+</html>
